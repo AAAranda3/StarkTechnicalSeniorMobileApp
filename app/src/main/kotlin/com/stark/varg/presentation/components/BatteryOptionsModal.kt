@@ -32,10 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.BatteryStatus
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorder
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPillDark
+import com.stark.varg.ui.theme.VargPitchBlack
 import com.stark.varg.ui.theme.VargSurfaceCard
 import com.stark.varg.ui.theme.VargSurfaceDark
 import com.stark.varg.ui.theme.VargTextPrimary
@@ -43,7 +45,7 @@ import com.stark.varg.ui.theme.VargTextSecondary
 import com.stark.varg.ui.theme.VargWhite
 
 /**
- * Battery Health & Charging Options Modal (Inspired by modern EV & Stark design).
+ * Battery Health & Charging Options Modal.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,9 +77,7 @@ fun BatteryOptionsModal(
                 Text(
                     text = "BATTERY HEALTH & OPTIONS",
                     color = VargWhite,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ModalTitle,
                 )
                 Box(
                     modifier = Modifier
@@ -89,8 +89,7 @@ fun BatteryOptionsModal(
                     Text(
                         text = "✕",
                         color = VargTextSecondary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.CardTitle,
                     )
                 }
             }
@@ -114,14 +113,13 @@ fun BatteryOptionsModal(
                         Text(
                             text = "Current Charge",
                             color = VargTextSecondary,
-                            fontSize = 12.sp,
+                            style = StarkTypographyTokens.CardSubtitle,
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
                             text = "${battery.stateOfChargePct}%",
                             color = VargElectricGreen,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Black,
+                            style = StarkTypographyTokens.MetricMedium.copy(color = VargElectricGreen),
                         )
                     }
 
@@ -129,14 +127,13 @@ fun BatteryOptionsModal(
                         Text(
                             text = "Estimated Range",
                             color = VargTextSecondary,
-                            fontSize = 12.sp,
+                            style = StarkTypographyTokens.CardSubtitle,
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
                             text = "${battery.estimatedRangeKm} km",
                             color = VargWhite,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Black,
+                            style = StarkTypographyTokens.MetricMedium,
                         )
                     }
                 }
@@ -168,11 +165,11 @@ fun BatteryOptionsModal(
                         .border(1.dp, VargBorderSubtle, RoundedCornerShape(12.dp))
                         .padding(14.dp),
                 ) {
-                    Text("Cell Temp", color = VargTextSecondary, fontSize = 11.sp)
+                    Text("Cell Temp", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
                     Spacer(Modifier.height(4.dp))
-                    Text("${battery.temperatureC}°C", color = VargWhite, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("${battery.temperatureC}°C", color = VargWhite, style = StarkTypographyTokens.MetricSmall)
                     Spacer(Modifier.height(2.dp))
-                    Text("Status: Optimal", color = VargElectricGreen, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Status: Optimal", color = VargElectricGreen, style = StarkTypographyTokens.CardSubtitle.copy(color = VargElectricGreen))
                 }
 
                 Column(
@@ -182,22 +179,21 @@ fun BatteryOptionsModal(
                         .border(1.dp, VargBorderSubtle, RoundedCornerShape(12.dp))
                         .padding(14.dp),
                 ) {
-                    Text("Power State", color = VargTextSecondary, fontSize = 11.sp)
+                    Text("Power State", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
                     Spacer(Modifier.height(4.dp))
                     Text(
                         battery.chargingState.name.lowercase().replaceFirstChar { it.uppercase() },
                         color = VargWhite,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.ValueMedium,
                     )
                     Spacer(Modifier.height(2.dp))
-                    Text("Health: 99%", color = VargElectricGreen, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Health: 99%", color = VargElectricGreen, style = StarkTypographyTokens.CardSubtitle.copy(color = VargElectricGreen))
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Charging Limit / Threshold Selector (from Photo 4)
+            // Charging Limit / Threshold Selector
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -208,8 +204,7 @@ fun BatteryOptionsModal(
                 Text(
                     text = "Charging Threshold Target",
                     color = VargTextSecondary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = StarkTypographyTokens.TechnicalHeader,
                 )
                 Spacer(Modifier.height(10.dp))
                 Row(
@@ -237,9 +232,10 @@ fun BatteryOptionsModal(
                         ) {
                             Text(
                                 text = thresh,
-                                color = if (isSelected) com.stark.varg.ui.theme.VargPitchBlack else VargWhite,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) VargPitchBlack else VargWhite,
+                                style = StarkTypographyTokens.PillLabel.copy(
+                                    color = if (isSelected) VargPitchBlack else VargWhite,
+                                ),
                             )
                         }
                     }
@@ -261,9 +257,7 @@ fun BatteryOptionsModal(
                 Text(
                     text = "DONE",
                     color = VargTextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ButtonLabel,
                 )
             }
         }

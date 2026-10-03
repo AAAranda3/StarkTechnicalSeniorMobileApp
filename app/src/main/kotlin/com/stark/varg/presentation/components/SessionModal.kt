@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.SessionData
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorder
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargPillDark
@@ -64,9 +65,7 @@ fun SessionModal(
                 Text(
                     text = "SESSION STATISTICS",
                     color = VargWhite,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ModalTitle,
                 )
                 Box(
                     modifier = Modifier
@@ -78,8 +77,7 @@ fun SessionModal(
                     Text(
                         text = "✕",
                         color = VargTextSecondary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.CardTitle,
                     )
                 }
             }
@@ -118,9 +116,7 @@ fun SessionModal(
                 Text(
                     text = "CLOSE",
                     color = VargTextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ButtonLabel,
                 )
             }
         }
@@ -138,16 +134,13 @@ private fun MetricBox(label: String, value: String, modifier: Modifier = Modifie
         Text(
             text = value,
             color = VargWhite,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            style = StarkTypographyTokens.MetricSmall,
         )
         Spacer(Modifier.height(4.dp))
         Text(
             text = label.uppercase(),
             color = VargTextSecondary,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.5.sp,
+            style = StarkTypographyTokens.TechnicalLabel,
         )
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.SessionData
 import com.stark.varg.presentation.components.CircuitTelemetryCard
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
@@ -72,7 +73,7 @@ fun StatsScreen(
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Left Column: 2x2 Grid & Session Metadata Log
+                // Left Column: Metrics Grid & Session Metadata Log
                 Column(
                     modifier = Modifier
                         .weight(0.48f)
@@ -134,7 +135,7 @@ fun StatsScreen(
             ) {
                 Spacer(Modifier.height(8.dp))
 
-                // Primary 2x2 Grid strictly from session JSON
+                // Primary Metrics Grid strictly from session JSON
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -199,50 +200,47 @@ private fun SessionLogCard(
     ) {
         Text(
             text = "SESSION METADATA & TELEMETRY LOG",
-            color = VargWhite,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            style = StarkTypographyTokens.TechnicalHeader,
         )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Recorded Timestamp", color = VargTextSecondary, fontSize = 13.sp)
-            Text(timestamp, color = VargWhite, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Text("Recorded Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(timestamp, color = VargWhite, style = StarkTypographyTokens.ScaleTick)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Raw Elapsed Duration", color = VargTextSecondary, fontSize = 13.sp)
-            Text("${session.durationS} seconds", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Raw Elapsed Duration", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("${session.durationS} seconds", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Distance Logged", color = VargTextSecondary, fontSize = 13.sp)
-            Text("${(session.distanceKm * 1000).toInt()} meters", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Distance Logged", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("${(session.distanceKm * 1000).toInt()} meters", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Sync Status", color = VargTextSecondary, fontSize = 13.sp)
-            Text("100% Synchronized", color = Color(0xFFD4D4DC), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Telemetry Sync Status", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("100% Synchronized", color = Color(0xFFD4D4DC), style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Bus Channel", color = VargTextSecondary, fontSize = 13.sp)
-            Text("CAN Bus Varg Logger", color = VargTextSecondary, fontSize = 12.sp)
+            Text("Telemetry Bus Channel", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("CAN Bus Varg Logger", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
         }
     }
 }
@@ -258,16 +256,12 @@ private fun MetricCard(label: String, value: String, modifier: Modifier = Modifi
         Text(
             text = value,
             color = VargWhite,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
+            style = StarkTypographyTokens.MetricSmall,
         )
         Spacer(Modifier.height(4.dp))
         Text(
             text = label,
-            color = VargTextSecondary,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.5.sp,
+            style = StarkTypographyTokens.TechnicalHeader,
         )
     }
 }

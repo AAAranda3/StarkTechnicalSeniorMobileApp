@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargPillDark
 import com.stark.varg.ui.theme.VargTextPrimary
@@ -55,14 +56,13 @@ fun VargPrecisionMeter(
                 Text(
                     text = title,
                     color = VargTextPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = StarkTypographyTokens.CardTitle,
                 )
                 Spacer(Modifier.size(6.dp))
                 Text(
                     text = unit,
                     color = VargTextSecondary,
-                    fontSize = 12.sp,
+                    style = StarkTypographyTokens.CardSubtitle,
                 )
             }
 
@@ -80,26 +80,29 @@ fun VargPrecisionMeter(
                         Text(
                             text = sideLabel,
                             color = VargTextSecondary,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.6.sp,
+                            style = StarkTypographyTokens.TechnicalLabel,
                         )
                     }
                 }
 
-                // Numeric Badge in serious slightly rounded rectangular shape
-                Box(
-                    modifier = Modifier
-                        .background(Color(0xFF1E2028), RoundedCornerShape(4.dp))
-                        .border(1.dp, Color(0xFF383C4C), RoundedCornerShape(4.dp))
-                        .padding(horizontal = 10.dp, vertical = 4.dp),
-                    contentAlignment = Alignment.Center,
+                // Value Display in Stark Sans ExtraLight + Unit
+                Row(
+                    verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
-                        text = "$displayValue HP",
+                        text = displayValue,
                         color = VargWhite,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.MetricSmall,
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        text = unit.uppercase(),
+                        color = accentColor,
+                        style = StarkTypographyTokens.MetricUnit.copy(
+                            color = accentColor,
+                            fontSize = 11.sp,
+                        ),
+                        modifier = Modifier.padding(bottom = 2.dp),
                     )
                 }
             }
@@ -155,8 +158,7 @@ fun VargPrecisionMeter(
                 Text(
                     text = tick.toString(),
                     color = VargTextSecondary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = StarkTypographyTokens.ScaleTick,
                 )
             }
         }

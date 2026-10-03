@@ -18,8 +18,10 @@ mockk = "1.13.13"
 turbine = "1.2.0"
 viewmodelCompose = "2.8.7"
 lifecycleCompose = "2.8.7"
+splashscreen = "1.0.1"
 
 [libraries]
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

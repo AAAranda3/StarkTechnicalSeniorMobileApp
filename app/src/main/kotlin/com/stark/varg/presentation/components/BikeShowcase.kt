@@ -20,12 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -38,6 +34,7 @@ import coil.request.ImageRequest
 import com.stark.varg.domain.model.BatteryStatus
 import com.stark.varg.domain.model.BikeInfo
 import com.stark.varg.domain.model.DiagnosticsData
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
 import com.stark.varg.ui.theme.VargSecondary
@@ -80,16 +77,13 @@ fun BikeShowcase(
                 Text(
                     text = "STARK VARG",
                     color = VargWhite,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp,
+                    style = StarkTypographyTokens.BrandTitle.copy(fontSize = 15.sp, letterSpacing = 2.sp),
                 )
                 Spacer(Modifier.height(3.dp))
                 Text(
                     text = "Ready to ride!",
                     color = VargTextSecondary,
-                    fontSize = 12.sp,
-                    letterSpacing = 0.3.sp,
+                    style = StarkTypographyTokens.CardSubtitle,
                 )
             }
 
@@ -127,21 +121,22 @@ fun BikeShowcase(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    // Range Value
+                    // Range Value (Stark Sans ExtraLight)
                     Text(
                         text = "${battery.estimatedRangeKm}",
                         color = VargWhite,
                         fontSize = 38.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraLight,
                         letterSpacing = (-0.5).sp,
                     )
-                    Spacer(Modifier.width(3.dp))
+                    Spacer(Modifier.width(4.dp))
                     Text(
                         text = "KM",
                         color = VargWhite,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 2.dp),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 1.sp,
+                        modifier = Modifier.padding(bottom = 3.dp),
                     )
 
                     // Vertical Divider
@@ -150,7 +145,7 @@ fun BikeShowcase(
                         text = "|",
                         color = Color(0xFF383838),
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.Light,
+                        fontWeight = FontWeight.ExtraLight,
                     )
                     Spacer(Modifier.width(16.dp))
 
@@ -161,21 +156,22 @@ fun BikeShowcase(
                     )
                     Spacer(Modifier.width(8.dp))
 
-                    // SoC Percentage Value
+                    // SoC Percentage Value (Stark Sans ExtraLight)
                     Text(
                         text = "${battery.stateOfChargePct}",
                         color = VargWhite,
                         fontSize = 38.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraLight,
                         letterSpacing = (-0.5).sp,
                     )
-                    Spacer(Modifier.width(2.dp))
+                    Spacer(Modifier.width(3.dp))
                     Text(
                         text = "%",
                         color = VargWhite,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 2.dp),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 1.sp,
+                        modifier = Modifier.padding(bottom = 3.dp),
                     )
                 }
 
@@ -183,30 +179,21 @@ fun BikeShowcase(
                 Text(
                     text = "Estimated range",
                     color = VargTextSecondary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 0.5.sp,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = 1.sp,
                 )
             }
         }
 
         Spacer(Modifier.height(14.dp))
 
-        // 3. Hero Vehicle Stage with Seamless Studio Lighting & Floor Reflection
+        // Hero Vehicle Stage with Pure Black Background & Showroom Floor
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(185.dp)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            Color(0xFF000000),
-                            Color(0xFF0B0B0D),
-                            VargPitchBlack,
-                        ),
-                        radius = 580f,
-                    ),
-                ),
+                .background(VargPitchBlack),
             contentAlignment = Alignment.Center,
         ) {
             // Ambient Showroom Glow behind the motorcycle chassis
@@ -256,7 +243,7 @@ fun BikeShowcase(
                     ),
             )
 
-            // Async Image of the Stark VARG with soft edge feathering to dissolve black box
+            // Async Image of the Stark VARG - Seamlessly blends on pure black
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(bike.imageUrl)
@@ -265,31 +252,7 @@ fun BikeShowcase(
                 contentDescription = bike.model,
                 modifier = Modifier
                     .fillMaxWidth(0.95f)
-                    .height(160.dp)
-                    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-                    .drawWithContent {
-                        drawContent()
-                        // Fade horizontal boundaries into the showroom stage
-                        drawRect(
-                            brush = Brush.horizontalGradient(
-                                0f to Color.Transparent,
-                                0.12f to Color.Black,
-                                0.88f to Color.Black,
-                                1f to Color.Transparent,
-                            ),
-                            blendMode = BlendMode.DstIn,
-                        )
-                        // Fade vertical boundaries into the showroom stage
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                0f to Color.Transparent,
-                                0.14f to Color.Black,
-                                0.86f to Color.Black,
-                                1f to Color.Transparent,
-                            ),
-                            blendMode = BlendMode.DstIn,
-                        )
-                    },
+                    .height(160.dp),
                 contentScale = ContentScale.Fit,
             )
         }

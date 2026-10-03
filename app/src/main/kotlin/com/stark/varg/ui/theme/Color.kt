@@ -2,14 +2,14 @@ package com.stark.varg.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Stark VARG App - Bronze Edition
-// Base Dark: #1A1A1A | Secondary Accent: #B8962E
-val VargPitchBlack = Color(0xFF1A1A1A)
-val VargSurfaceDark = Color(0xFF141414)
-val VargSurfaceCard = Color(0xFF2C2D35)
-val VargSurfaceCardElevated = Color(0xFF363844)
-val VargBorder = Color(0xFF404250)
-val VargBorderSubtle = Color(0xFF383A46)
+// Stark VARG - Bronze Edition Palette
+// Base Dark: #000000 (Pure OLED Black) | Secondary Accent: #B8962E
+val VargPitchBlack = Color(0xFF000000)
+val VargSurfaceDark = Color(0xFF0D0D0E)
+val VargSurfaceCard = Color(0xFF141417)
+val VargSurfaceCardElevated = Color(0xFF1C1C22)
+val VargBorder = Color(0xFF26262C)
+val VargBorderSubtle = Color(0xFF1E1E24)
 
 // Secondary Brand Color (Bronze / Copper: #B8962E)
 val VargSecondary = Color(0xFFB8962E)

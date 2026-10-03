@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,14 +28,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorder
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargPillDark
+import com.stark.varg.ui.theme.VargPitchBlack
 import com.stark.varg.ui.theme.VargStarkRed
 import com.stark.varg.ui.theme.VargSurfaceCard
 import com.stark.varg.ui.theme.VargSurfaceDark
@@ -74,9 +78,7 @@ fun PowerModesModal(
                 Text(
                     text = "POWER MODES",
                     color = VargWhite,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
+                    style = StarkTypographyTokens.ModalTitle,
                 )
                 Box(
                     modifier = Modifier
@@ -88,43 +90,56 @@ fun PowerModesModal(
                     Text(
                         text = "✕",
                         color = VargTextSecondary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.CardTitle,
                     )
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Mode Pills Row (Photo 3)
+            // Mode Pills Row (Square tiles matching card hegemony)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 modes.forEach { mode ->
                     val isSelected = mode == selectedMode
                     Box(
                         modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp)
                             .background(
-                                color = if (isSelected) VargWhite else VargPillDark,
-                                shape = RoundedCornerShape(50),
+                                color = if (isSelected) VargWhite else VargSurfaceCard,
+                                shape = RoundedCornerShape(10.dp),
                             )
                             .border(
                                 width = 1.dp,
                                 color = if (isSelected) VargWhite else VargBorderSubtle,
-                                shape = RoundedCornerShape(50),
+                                shape = RoundedCornerShape(10.dp),
                             )
                             .clickable { selectedMode = mode }
-                            .padding(horizontal = 14.dp, vertical = 6.dp),
+                            .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(
-                            text = mode,
-                            color = if (isSelected) com.stark.varg.ui.theme.VargPitchBlack else VargTextSecondary,
-                            fontSize = 12.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            VargIconModes(
+                                color = if (isSelected) VargPitchBlack else VargTextSecondary.copy(alpha = 0.5f),
+                                sizeDp = 12.dp,
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = mode,
+                                color = if (isSelected) VargPitchBlack else VargTextSecondary,
+                                style = StarkTypographyTokens.CardTitle.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    fontSize = 13.sp,
+                                ),
+                            )
+                        }
                     }
                 }
             }
@@ -132,10 +147,9 @@ fun PowerModesModal(
             Spacer(Modifier.height(20.dp))
 
             Text(
-                text = "MODE 3 • ${settings.powerMap.uppercase()}",
+                text = "$selectedMode • ${settings.powerMap.uppercase()}",
                 color = VargWhite,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = StarkTypographyTokens.ScreenTitle,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -217,9 +231,7 @@ fun PowerModesModal(
                 Text(
                     text = "CLOSE MODES",
                     color = VargTextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ButtonLabel,
                 )
             }
         }

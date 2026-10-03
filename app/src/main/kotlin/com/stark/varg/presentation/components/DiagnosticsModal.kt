@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.Warning
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorder
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargPillDark
@@ -76,9 +77,7 @@ fun DiagnosticsModal(
                     Text(
                         text = "VEHICLE ALERTS & ADVISORIES",
                         color = VargTextPrimary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.ModalTitle,
                     )
                 }
 
@@ -92,8 +91,7 @@ fun DiagnosticsModal(
                     Text(
                         text = "✕",
                         color = VargTextSecondary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.CardTitle,
                     )
                 }
             }
@@ -104,7 +102,7 @@ fun DiagnosticsModal(
                 Text(
                     text = "No active warnings. All vehicle sensors reporting nominal.",
                     color = VargTextSecondary,
-                    fontSize = 13.sp,
+                    style = StarkTypographyTokens.BodySmall,
                 )
             } else {
                 // List of Warnings (Friendly names, NO raw codes like W_MOT_TEMP_HIGH)
@@ -127,8 +125,7 @@ fun DiagnosticsModal(
                         Text(
                             text = "Diagnostic Sensor Advisory",
                             color = VargStarkRed,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            style = StarkTypographyTokens.ValueMedium.copy(color = VargStarkRed),
                         )
                         StarkPill(
                             text = "ACTIVE",
@@ -156,9 +153,7 @@ fun DiagnosticsModal(
                 Text(
                     text = "CLOSE",
                     color = VargTextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ButtonLabel,
                 )
             }
         }
@@ -189,9 +184,7 @@ private fun FriendlyWarningItem(warning: Warning) {
             Text(
                 text = "Thermal Sensor Advisory",
                 color = VargTextSecondary,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalLabel,
             )
             StarkPill(
                 text = warning.severity.name,
@@ -206,8 +199,7 @@ private fun FriendlyWarningItem(warning: Warning) {
         Text(
             text = warning.message,
             color = VargWhite,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
+            style = StarkTypographyTokens.CardTitle,
         )
 
         Spacer(Modifier.height(4.dp))
@@ -215,7 +207,7 @@ private fun FriendlyWarningItem(warning: Warning) {
         Text(
             text = "Cooling system active. Performance is being regulated.",
             color = VargTextSecondary,
-            fontSize = 11.sp,
+            style = StarkTypographyTokens.CardSubtitle,
         )
     }
 }

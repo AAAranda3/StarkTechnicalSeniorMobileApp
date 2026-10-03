@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.MotorStatus
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorder
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargCyan
@@ -75,9 +76,7 @@ fun MotorModal(
                     Text(
                         text = "POWERTRAIN & MOTOR",
                         color = VargWhite,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.ModalTitle,
                     )
                 }
 
@@ -91,8 +90,7 @@ fun MotorModal(
                     Text(
                         text = "✕",
                         color = VargTextSecondary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.CardTitle,
                     )
                 }
             }
@@ -136,16 +134,13 @@ fun MotorModal(
                     Text(
                         text = "${motor.temperatureC}°C",
                         color = tempColor,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.MetricSmall.copy(color = tempColor),
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "CORE TEMP",
                         color = VargTextSecondary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.TechnicalLabel,
                     )
                 }
 
@@ -159,16 +154,13 @@ fun MotorModal(
                     Text(
                         text = if (isTempElevated) "WARM" else "OPTIMAL",
                         color = tempColor,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.ValueMedium.copy(color = tempColor),
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "THERMAL STATE",
                         color = VargTextSecondary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.TechnicalLabel,
                     )
                 }
             }
@@ -187,24 +179,24 @@ fun MotorModal(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Carbon Sleeve Inverter", color = VargTextSecondary, fontSize = 12.sp)
-                    Text("Active (360V)", color = VargWhite, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Carbon Sleeve Inverter", color = VargTextSecondary, style = StarkTypographyTokens.BodySmall)
+                    Text("Active (360V)", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Peak Torque", color = VargTextSecondary, fontSize = 12.sp)
-                    Text("938 Nm (Wheel)", color = VargWhite, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Peak Torque", color = VargTextSecondary, style = StarkTypographyTokens.BodySmall)
+                    Text("938 Nm (Wheel)", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Liquid Cooling Loop", color = VargTextSecondary, fontSize = 12.sp)
-                    Text("Circulating", color = VargElectricGreen, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Liquid Cooling Loop", color = VargTextSecondary, style = StarkTypographyTokens.BodySmall)
+                    Text("Circulating", color = VargElectricGreen, style = StarkTypographyTokens.ValueMedium.copy(color = VargElectricGreen))
                 }
             }
 
@@ -223,9 +215,7 @@ fun MotorModal(
                 Text(
                     text = "CLOSE MOTOR",
                     color = VargTextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ButtonLabel,
                 )
             }
         }

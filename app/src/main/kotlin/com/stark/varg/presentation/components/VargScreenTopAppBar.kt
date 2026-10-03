@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.ui.theme.StarkTypography
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
-import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
 import com.stark.varg.ui.theme.VargSecondary
 import com.stark.varg.ui.theme.VargSurfaceDark
@@ -41,7 +41,7 @@ fun VargScreenTopAppBar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     statusText: String? = null,
-    statusColor: Color = VargElectricGreen,
+    statusColor: Color = VargWhite,
 ) {
     Row(
         modifier = modifier
@@ -78,8 +78,7 @@ fun VargScreenTopAppBar(
                 Text(
                     text = subtitle,
                     color = VargTextSecondary,
-                    fontSize = 11.sp,
-                    letterSpacing = 0.3.sp,
+                    style = StarkTypographyTokens.CardSubtitle,
                 )
             }
         }
@@ -95,9 +94,7 @@ fun VargScreenTopAppBar(
                 Text(
                     text = statusText,
                     color = statusColor,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.TechnicalHeader,
                 )
             }
         }

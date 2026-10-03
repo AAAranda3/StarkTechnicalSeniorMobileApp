@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.SessionData
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargPillDark
 import com.stark.varg.ui.theme.VargTextPrimary
@@ -37,9 +38,7 @@ fun SessionCard(session: SessionData, modifier: Modifier = Modifier) {
                 Text(
                     text = "SESSION TELEMETRY",
                     color = VargTextSecondary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
+                    style = StarkTypographyTokens.TechnicalHeader,
                 )
                 StarkPill(
                     text = "LIVE SESSION",
@@ -69,16 +68,13 @@ private fun StatItem(label: String, value: String) {
         Text(
             text = value,
             color = VargTextPrimary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            style = StarkTypographyTokens.MetricSmall,
         )
         Spacer(Modifier.height(3.dp))
         Text(
             text = label.uppercase(),
             color = VargTextSecondary,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.5.sp,
+            style = StarkTypographyTokens.TechnicalLabel,
         )
     }
 }

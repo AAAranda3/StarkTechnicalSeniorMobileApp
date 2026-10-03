@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.SessionData
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
@@ -90,9 +91,7 @@ fun CircuitTelemetryCard(
                 Text(
                     text = "CIRCUIT GPS TRACE",
                     color = VargWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
+                    style = StarkTypographyTokens.TechnicalHeader,
                 )
             }
 
@@ -105,9 +104,7 @@ fun CircuitTelemetryCard(
                 Text(
                     text = "GPS TELEMETRY",
                     color = Color(0xFFD4D4DC),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.TechnicalLabel,
                 )
             }
         }
@@ -118,44 +115,129 @@ fun CircuitTelemetryCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(190.dp)
+                .height(230.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(VargPitchBlack)
                 .border(1.dp, Color(0xFF2E2E2E), RoundedCornerShape(12.dp))
                 .padding(12.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Canvas(modifier = Modifier.fillMaxWidth().height(165.dp)) {
+            Canvas(modifier = Modifier.fillMaxWidth().height(206.dp)) {
                 val w = size.width
                 val h = size.height
 
-                // Closed-loop Motocross Circuit layout
+                // Normalized coordinate mapper preserving exact Supercross track geometry
+                val padX = 14.dp.toPx()
+                val padY = 12.dp.toPx()
+                val availW = w - padX * 2
+                val availH = h - padY * 2
+                val trackAspect = 0.92f
+                val scale = minOf(availW, availH / trackAspect)
+                val scaleX = scale
+                val scaleY = scale * trackAspect
+                val offsetX = padX + (availW - scaleX) / 2f
+                val offsetY = padY + (availH - scaleY) / 2f
+
+                fun nx(x: Float): Float = offsetX + x * scaleX
+                fun ny(y: Float): Float = offsetY + y * scaleY
+
+                // Authentic AMA Supercross Championship Stadium Circuit Layout
                 val circuitPath = Path().apply {
-                    // Start/Finish straightaway (Top)
-                    moveTo(w * 0.25f, h * 0.20f)
-                    // High-speed main straight
-                    lineTo(w * 0.70f, h * 0.20f)
-                    // Turn 1 (Hairpin Right)
-                    cubicTo(w * 0.88f, h * 0.20f, w * 0.92f, h * 0.42f, w * 0.82f, h * 0.52f)
-                    // Infield rhythm section
-                    lineTo(w * 0.58f, h * 0.52f)
-                    // Turn 2 (Chicane Left)
-                    cubicTo(w * 0.50f, h * 0.52f, w * 0.48f, h * 0.65f, w * 0.56f, h * 0.75f)
-                    // Sweeper turn (Turn 3)
-                    cubicTo(w * 0.70f, h * 0.85f, w * 0.85f, h * 0.85f, w * 0.82f, h * 0.92f)
-                    // Back hairpin
-                    cubicTo(w * 0.75f, h * 0.98f, w * 0.25f, h * 0.98f, w * 0.18f, h * 0.82f)
-                    // Technical esses section
-                    lineTo(w * 0.18f, h * 0.60f)
-                    // Turn 4
-                    cubicTo(w * 0.18f, h * 0.45f, w * 0.32f, h * 0.42f, w * 0.32f, h * 0.32f)
-                    // Final corner into main straight
-                    cubicTo(w * 0.32f, h * 0.20f, w * 0.20f, h * 0.20f, w * 0.25f, h * 0.20f)
+                    // Top Straight - starts exit of top-left hairpin across the top
+                    moveTo(nx(0.14f), ny(0.06f))
+                    lineTo(nx(0.85f), ny(0.06f))
+
+                    // Top-Right Corner (sweeping down into perimeter whoops straight)
+                    cubicTo(
+                        nx(0.93f), ny(0.06f),
+                        nx(0.95f), ny(0.12f),
+                        nx(0.92f), ny(0.18f),
+                    )
+
+                    // Right Whoops Straight (diagonal perimeter straight)
+                    lineTo(nx(0.68f), ny(0.80f))
+
+                    // Bottom Bowl Turn (wide sweeping bowl turn at stadium south end)
+                    cubicTo(
+                        nx(0.64f), ny(0.94f),
+                        nx(0.52f), ny(0.94f),
+                        nx(0.48f), ny(0.82f),
+                    )
+
+                    // Infield Rhythm Section (heading up-left)
+                    lineTo(nx(0.33f), ny(0.52f))
+
+                    // Mid Hairpin Turn (curling around clockwise)
+                    cubicTo(
+                        nx(0.29f), ny(0.45f),
+                        nx(0.23f), ny(0.47f),
+                        nx(0.22f), ny(0.56f),
+                    )
+
+                    // Infield Secondary Rhythm Section (heading down-left)
+                    lineTo(nx(0.14f), ny(0.78f))
+
+                    // Bottom-Left Corner (sweeping into finish straight)
+                    cubicTo(
+                        nx(0.08f), ny(0.84f),
+                        nx(0.06f), ny(0.80f),
+                        nx(0.07f), ny(0.68f),
+                    )
+
+                    // Left Finish Straight (heading north past start gate)
+                    lineTo(nx(0.07f), ny(0.28f))
+
+                    // Upper Infield Turn (turning east into upper sand lane)
+                    cubicTo(
+                        nx(0.07f), ny(0.22f),
+                        nx(0.11f), ny(0.22f),
+                        nx(0.16f), ny(0.22f),
+                    )
+
+                    // Upper Sand Straight (heading east above start chute)
+                    lineTo(nx(0.48f), ny(0.22f))
+
+                    // Turn into Vertical Center Sand Straight (turning south)
+                    cubicTo(
+                        nx(0.54f), ny(0.22f),
+                        nx(0.54f), ny(0.26f),
+                        nx(0.54f), ny(0.32f),
+                    )
+
+                    // Vertical Center Sand Straight (heading south down the center)
+                    lineTo(nx(0.54f), ny(0.66f))
+
+                    // Center Bottom Hairpin (curling counter-clockwise)
+                    cubicTo(
+                        nx(0.54f), ny(0.76f),
+                        nx(0.65f), ny(0.76f),
+                        nx(0.66f), ny(0.64f),
+                    )
+
+                    // Up-Right Connector Straight (heading north-east)
+                    lineTo(nx(0.74f), ny(0.38f))
+
+                    // Sweeper into Sub-Top Straight (turning left)
+                    cubicTo(
+                        nx(0.76f), ny(0.24f),
+                        nx(0.74f), ny(0.14f),
+                        nx(0.68f), ny(0.14f),
+                    )
+
+                    // Sub-Top Straight (heading west across stadium)
+                    lineTo(nx(0.14f), ny(0.14f))
+
+                    // Top-Left Bowl Hairpin (curling counter-clockwise back into Main Lane)
+                    cubicTo(
+                        nx(0.05f), ny(0.14f),
+                        nx(0.05f), ny(0.06f),
+                        nx(0.14f), ny(0.06f),
+                    )
                     close()
                 }
 
-                // 0. GPS Telemetry Grid background lines
-                val gridColor = Color(0xFF222222)
+                // GPS Telemetry Grid background lines
+                val gridColor = Color(0xFF1E1E22)
                 val stepX = w / 8f
                 for (i in 1..7) {
                     val x = stepX * i
@@ -167,10 +249,31 @@ fun CircuitTelemetryCard(
                     drawLine(gridColor, Offset(0f, y), Offset(w, y), strokeWidth = 1f)
                 }
 
-                // 1. Draw outer glow / track bed
+                // Start Gate & Chute (architectural layout feature from AMA Supercross drawing)
+                val startChutePath = Path().apply {
+                    moveTo(nx(0.01f), ny(0.405f))
+                    lineTo(nx(0.07f), ny(0.405f))
+                }
+                drawPath(
+                    path = startChutePath,
+                    color = Color(0xFF26262C),
+                    style = Stroke(
+                        width = 12.dp.toPx(),
+                        cap = StrokeCap.Square,
+                    ),
+                )
+                drawLine(
+                    color = Color(0xFF6E6E78),
+                    start = Offset(nx(0.01f), ny(0.36f)),
+                    end = Offset(nx(0.01f), ny(0.45f)),
+                    strokeWidth = 2.5.dp.toPx(),
+                    cap = StrokeCap.Square,
+                )
+
+                // Outer track bed (dark racing clay)
                 drawPath(
                     path = circuitPath,
-                    color = Color(0xFF2C2C2C),
+                    color = Color(0xFF26262C),
                     style = Stroke(
                         width = 14.dp.toPx(),
                         cap = StrokeCap.Round,
@@ -178,10 +281,10 @@ fun CircuitTelemetryCard(
                     ),
                 )
 
-                // 2. Draw race line (circuit track)
+                // Race groove line
                 drawPath(
                     path = circuitPath,
-                    color = Color(0xFF444444),
+                    color = Color(0xFF484854),
                     style = Stroke(
                         width = 4.dp.toPx(),
                         cap = StrokeCap.Round,
@@ -189,10 +292,10 @@ fun CircuitTelemetryCard(
                     ),
                 )
 
-                // 3. Highlight main straight speed trap zone (where max speed was recorded)
+                // Highlight main straight speed trap zone (where max speed was recorded)
                 val speedTrapPath = Path().apply {
-                    moveTo(w * 0.30f, h * 0.20f)
-                    lineTo(w * 0.70f, h * 0.20f)
+                    moveTo(nx(0.20f), ny(0.06f))
+                    lineTo(nx(0.85f), ny(0.06f))
                 }
                 drawPath(
                     path = speedTrapPath,
@@ -203,26 +306,38 @@ fun CircuitTelemetryCard(
                     ),
                 )
 
-                // 4. Start / Finish Line marker
-                val sfX = w * 0.25f
-                val sfY = h * 0.20f
+                // Start / Finish Line marker
+                val sfX = nx(0.20f)
+                val sfY = ny(0.06f)
                 drawLine(
                     color = VargWhite,
-                    start = Offset(sfX, sfY - 9.dp.toPx()),
-                    end = Offset(sfX, sfY + 9.dp.toPx()),
+                    start = Offset(sfX, sfY - 8.dp.toPx()),
+                    end = Offset(sfX, sfY + 8.dp.toPx()),
                     strokeWidth = 3.dp.toPx(),
                     cap = StrokeCap.Square,
                 )
 
-                // 5. Animated Rider Position along the circuit
+                // Timing sector trap points
+                drawCircle(
+                    color = VargSecondary,
+                    radius = 3.5.dp.toPx(),
+                    center = Offset(nx(0.92f), ny(0.18f)),
+                )
+                drawCircle(
+                    color = VargSecondary,
+                    radius = 3.5.dp.toPx(),
+                    center = Offset(nx(0.54f), ny(0.48f)),
+                )
+
+                // Animated Rider Position along the circuit
                 val pathMeasure = PathMeasure()
                 pathMeasure.setPath(circuitPath, false)
                 val pathLength = pathMeasure.length
                 val riderOffset = pathMeasure.getPosition(pathLength * riderProgress)
 
-                // Pulse circle
+                // Pulsing radar wave around rider
                 drawCircle(
-                    color = VargSecondary.copy(alpha = 0.35f),
+                    color = VargSecondary.copy(alpha = 0.30f),
                     radius = 9.dp.toPx(),
                     center = riderOffset,
                 )
@@ -252,9 +367,7 @@ fun CircuitTelemetryCard(
                 Text(
                     text = "S/F GATE",
                     color = VargWhite,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ScaleTick,
                 )
             }
 
@@ -268,9 +381,7 @@ fun CircuitTelemetryCard(
                 Text(
                     text = "SECTOR 1 TRAP",
                     color = Color(0xFFD4D4DC),
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ScaleTick,
                 )
             }
 
@@ -284,8 +395,7 @@ fun CircuitTelemetryCard(
                 Text(
                     text = "GPS SECTOR 2",
                     color = VargTextSecondary,
-                    fontSize = 9.sp,
-                    letterSpacing = 0.5.sp,
+                    style = StarkTypographyTokens.ScaleTick,
                 )
             }
         }
@@ -298,18 +408,18 @@ fun CircuitTelemetryCard(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column {
-                Text("CALCULATED PACE", color = VargTextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
-                Text(formatPace(session.distanceKm, session.durationS), color = VargWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text("CALCULATED PACE", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
+                Text(formatPace(session.distanceKm, session.durationS), color = VargWhite, style = StarkTypographyTokens.CardTitle)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("GNSS SAMPLING", color = VargTextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
-                Text("10 Hz DGPS", color = VargWhite, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text("GNSS SAMPLING", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
+                Text("10 Hz DGPS", color = VargWhite, style = StarkTypographyTokens.CardTitle)
             }
 
             Column(horizontalAlignment = Alignment.End) {
-                Text("TIMING GATES", color = VargTextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
-                Text("3 Sectors Active", color = Color(0xFFD4D4DC), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text("TIMING GATES", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
+                Text("3 Sectors Active", color = Color(0xFFD4D4DC), style = StarkTypographyTokens.CardTitle)
             }
         }
     }

@@ -27,6 +27,7 @@ import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
 import com.stark.varg.domain.model.SessionData
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargCyan
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -42,7 +43,7 @@ import androidx.compose.ui.graphics.Color
 import com.stark.varg.ui.theme.VargWhite
 
 /**
- * 2x2 Quick Action Grid inspired by the official Varg App 3.0 (Photo 2 & Photo 1).
+ * Quick Action Grid for ride parameters and telemetry management.
  * Features large touch targets for glove-friendly interaction while riding.
  */
 @Composable
@@ -77,12 +78,12 @@ fun VargActionGrid(
             .padding(if (isLandscape) 0.dp else 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        // Row 1: MODES & MOTOR
+        // MODES & MOTOR Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // Tile 1: MODES (Opens Power Modes Modal with M1-M5 & Sliders)
+            // Tile: MODES (Opens Power Modes Modal with M1-M5 & Sliders)
             ActionTile(
                 modifier = Modifier.weight(1f),
                 icon = "⚡",
@@ -97,7 +98,7 @@ fun VargActionGrid(
                 onClick = onOpenPowerModes,
             )
 
-            // Tile 2: MOTOR (Displays current motor telemetry)
+            // Tile: MOTOR (Displays current motor telemetry)
             ActionTile(
                 modifier = Modifier.weight(1f),
                 icon = "⚙",
@@ -113,12 +114,12 @@ fun VargActionGrid(
             )
         }
 
-        // Row 2: STATS & DIAGNOSTICS
+        // STATS & DIAGNOSTICS Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // Tile 3: STATS (Opens Trip Summary Modal)
+            // Tile: STATS (Opens Trip Summary Modal)
             ActionTile(
                 modifier = Modifier.weight(1f),
                 icon = "📊",
@@ -133,7 +134,7 @@ fun VargActionGrid(
                 onClick = onOpenSession,
             )
 
-            // Tile 4: DIAGNOSTICS (Opens Diagnostics Modal)
+            // Tile: DIAGNOSTICS (Opens Diagnostics Modal)
             ActionTile(
                 modifier = Modifier.weight(1f),
                 icon = if (hasAlert) "⚠" else "✓",
@@ -205,7 +206,7 @@ private fun ActionTile(
             Text(
                 text = title,
                 color = textColor,
-                style = com.stark.varg.ui.theme.StarkTypography.labelLarge,
+                style = StarkTypographyTokens.CardTitle,
             )
 
             Spacer(Modifier.height(2.dp))
@@ -213,7 +214,7 @@ private fun ActionTile(
             Text(
                 text = subtitle,
                 color = subtitleColor,
-                style = com.stark.varg.ui.theme.StarkTypography.bodyMedium,
+                style = StarkTypographyTokens.CardSubtitle,
                 maxLines = 1,
             )
         }

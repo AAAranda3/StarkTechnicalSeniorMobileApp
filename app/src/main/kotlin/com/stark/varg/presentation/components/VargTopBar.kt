@@ -27,6 +27,7 @@ import com.stark.varg.domain.model.BikeInfo
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.SessionData
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargGreenDot
 import com.stark.varg.ui.theme.VargPitchBlack
@@ -63,10 +64,7 @@ fun VargTopBar(
             Text(
                 text = "VARG",
                 color = VargTextPrimary,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp,
-                fontFamily = FontFamily.SansSerif,
+                style = StarkTypographyTokens.BrandTitle,
             )
             Spacer(Modifier.width(8.dp))
             Box(
@@ -79,13 +77,11 @@ fun VargTopBar(
             Text(
                 text = bike.variant.uppercase(),
                 color = VargTextSecondary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 1.sp,
+                style = StarkTypographyTokens.TechnicalHeader,
             )
         }
 
-        // Center: Session Odometer + Connected Indicator (from App 3.0 Photo)
+        // Center: Session Odometer + Connected Indicator
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -93,8 +89,7 @@ fun VargTopBar(
             Text(
                 text = "$durationFormatted   ${session.distanceKm} km",
                 color = VargTextPrimary,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
+                style = StarkTypographyTokens.ValueMedium,
             )
             Spacer(Modifier.width(10.dp))
             Box(
@@ -106,7 +101,7 @@ fun VargTopBar(
             Text(
                 text = "Connected",
                 color = VargTextSecondary,
-                fontSize = 11.sp,
+                style = StarkTypographyTokens.CardSubtitle,
             )
         }
 
@@ -124,19 +119,18 @@ fun VargTopBar(
                     Text(
                         text = "⚠ $totalAlerts ALERT",
                         color = alertColor,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.TechnicalLabel,
                     )
                 }
                 Spacer(Modifier.width(8.dp))
             }
 
-            // Official Varg App 3.0 Battery Capsule (Electric Green with Black Text)
+            // Battery Capsule Indicator (Electric Green with Black Text)
             Box(
                 modifier = Modifier
                     .background(VargElectricGreen, RoundedCornerShape(50))
                     .clickable { onBatteryClick() }
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                    .padding(horizontal = 10.dp, vertical = 3.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -145,13 +139,14 @@ fun VargTopBar(
                         color = VargPitchBlack,
                         fontSize = 11.sp,
                     )
-                    Spacer(Modifier.width(2.dp))
+                    Spacer(Modifier.width(3.dp))
                     Text(
                         text = "${battery.stateOfChargePct}",
                         color = VargPitchBlack,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-0.2).sp,
+                        style = StarkTypographyTokens.MetricMini.copy(
+                            color = VargPitchBlack,
+                            fontWeight = FontWeight.Medium,
+                        ),
                     )
                 }
             }

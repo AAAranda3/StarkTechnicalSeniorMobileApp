@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.BikeInfo
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPillDark
@@ -28,7 +29,7 @@ import com.stark.varg.ui.theme.VargTextPrimary
 import com.stark.varg.ui.theme.VargTextSecondary
 
 /**
- * Enterprise Vehicle Status Header (Clean, functional, no redundant motorcycle image).
+ * Enterprise Vehicle Status Header.
  */
 @Composable
 fun BikeHeaderCard(
@@ -52,16 +53,14 @@ fun BikeHeaderCard(
                         Text(
                             text = bike.model,
                             color = VargTextPrimary,
-                            fontSize = if (isLandscape) 18.sp else 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = (-0.5).sp,
+                            style = StarkTypographyTokens.ScreenTitle,
                         )
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "Variant: ${bike.variant}  •  Firmware: v${bike.firmwareVersion}",
                         color = VargTextSecondary,
-                        fontSize = 12.sp,
+                        style = StarkTypographyTokens.CardSubtitle,
                     )
                 }
 
@@ -90,9 +89,7 @@ fun BikeHeaderCard(
                         Text(
                             text = "ONLINE",
                             color = VargElectricGreen,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp,
+                            style = StarkTypographyTokens.TechnicalLabel.copy(color = VargElectricGreen),
                         )
                     }
                 }

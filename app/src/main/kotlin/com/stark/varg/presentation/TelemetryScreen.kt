@@ -89,7 +89,7 @@ fun TelemetryScreen(
                     when (currentDestination) {
                         TelemetryDestination.Dashboard -> {
                             if (isLandscape) {
-                                // Landscape Mode: Adaptive 2-Column Dashboard
+                                // Landscape Mode: Adaptive Dashboard
                                 Row(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -141,9 +141,10 @@ fun TelemetryScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxSize()
+                                        .background(VargPitchBlack)
                                         .verticalScroll(rememberScrollState()),
                                 ) {
-                                    // Section 1: Hero Motorcycle Showcase
+                                    // Hero Motorcycle Showcase
                                     BikeShowcase(
                                         bike = snap.bike,
                                         battery = snap.battery,
@@ -152,7 +153,7 @@ fun TelemetryScreen(
                                         onOpenDiagnostics = { viewModel.navigateTo(TelemetryDestination.Diagnostics) },
                                     )
 
-                                    // Section 2: Stealth Black Section with Centered Battery/Autonomy & 4 Dark Grey Tiles
+                                    // Stealth Black Section with Centered Battery/Autonomy & Dark Grey Tiles
                                     PortraitDashboardCard(
                                         battery = snap.battery,
                                         settings = snap.rideSettings,

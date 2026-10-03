@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.MotorStatus
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargCyan
 import com.stark.varg.ui.theme.VargTextSecondary
 import com.stark.varg.ui.theme.VargWarningAmber
@@ -39,20 +40,20 @@ fun MotorCard(motor: MotorStatus, modifier: Modifier = Modifier) {
                 Text(
                     text = "${motor.powerHp} HP",
                     color = VargCyan,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = StarkTypographyTokens.ValueMedium.copy(color = VargCyan),
                 )
                 Text(
                     text = "Temp ${motor.temperatureC}°C",
                     color = if (isTempElevated) VargWarningAmber else VargTextSecondary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = StarkTypographyTokens.CardSubtitle.copy(
+                        color = if (isTempElevated) VargWarningAmber else VargTextSecondary,
+                    ),
                 )
             }
 
             Spacer(Modifier.height(8.dp))
 
-            // Precision Power Meter from Official Varg App (Photo 3)
+            // Precision Power Meter
             VargPrecisionMeter(
                 title = "⚡ Power",
                 unit = "hp",

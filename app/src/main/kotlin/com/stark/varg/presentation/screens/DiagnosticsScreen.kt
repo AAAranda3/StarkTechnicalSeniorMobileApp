@@ -30,6 +30,7 @@ import com.stark.varg.domain.model.Warning
 import com.stark.varg.domain.model.WarningSeverity
 import com.stark.varg.presentation.components.StarkPill
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
@@ -59,7 +60,7 @@ fun DiagnosticsScreen(
             .background(VargPitchBlack)
             .padding(horizontal = 16.dp),
     ) {
-        // Standard Navigation TopAppBar (No cutre buttons)
+        // Standard Navigation TopAppBar
         VargScreenTopAppBar(
             title = "VEHICLE DIAGNOSTICS",
             subtitle = "Advisory Log & Fault Diagnostics",
@@ -98,10 +99,8 @@ fun DiagnosticsScreen(
                     if (diagnostics.warnings.isNotEmpty()) {
                         Text(
                             text = "ACTIVE WARNINGS (${diagnostics.warnings.size})",
+                            style = StarkTypographyTokens.TechnicalHeader,
                             color = VargWhite,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
                         )
 
                         diagnostics.warnings.forEach { warning ->
@@ -111,7 +110,7 @@ fun DiagnosticsScreen(
                         Text(
                             text = "No active warnings",
                             color = VargTextSecondary,
-                            fontSize = 13.sp,
+                            style = StarkTypographyTokens.CardSubtitle,
                         )
                     }
                 }
@@ -133,10 +132,8 @@ fun DiagnosticsScreen(
                 if (diagnostics.warnings.isNotEmpty()) {
                     Text(
                         text = "ACTIVE WARNINGS (${diagnostics.warnings.size})",
+                        style = StarkTypographyTokens.TechnicalHeader,
                         color = VargWhite,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
                     )
 
                     Spacer(Modifier.height(8.dp))
@@ -180,14 +177,12 @@ private fun DiagnosticStatusBanner(
             Text(
                 text = if (hasAlerts) "ADVISORIES REPORTED" else "ALL SENSORS NOMINAL",
                 color = if (hasAlerts) alertColor else VargElectricGreen,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalHeader,
             )
             Text(
                 text = "${diagnostics.warnings.size} Warnings • ${diagnostics.faultCodes.size} Faults",
                 color = VargTextSecondary,
-                fontSize = 11.sp,
+                style = StarkTypographyTokens.CardSubtitle,
             )
         }
     }
@@ -209,24 +204,21 @@ private fun FaultCodesCard(
         Text(
             text = "FAULT CODES LOG",
             color = VargWhite,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            style = StarkTypographyTokens.TechnicalHeader,
         )
 
         if (diagnostics.faultCodes.isEmpty()) {
             Text(
                 text = "0 DTC Fault Codes registered in vehicle memory.",
                 color = VargTextSecondary,
-                fontSize = 13.sp,
+                style = StarkTypographyTokens.BodySmall,
             )
         } else {
             diagnostics.faultCodes.forEach { code ->
                 Text(
                     text = code,
                     color = VargStarkRed,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = StarkTypographyTokens.ValueMedium.copy(color = VargStarkRed),
                 )
             }
         }
@@ -235,8 +227,8 @@ private fun FaultCodesCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Timestamp", color = VargTextSecondary, fontSize = 12.sp)
-            Text(timestamp, color = VargTextSecondary, fontSize = 11.sp)
+            Text("Telemetry Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(timestamp, color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
         }
     }
 }
@@ -265,9 +257,7 @@ private fun FullWarningCard(warning: Warning) {
             Text(
                 text = "WARNING CODE: ${warning.code}",
                 color = VargTextSecondary,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalLabel,
             )
             StarkPill(
                 text = warning.severity.name,
@@ -282,8 +272,7 @@ private fun FullWarningCard(warning: Warning) {
         Text(
             text = warning.message,
             color = VargWhite,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold,
+            style = StarkTypographyTokens.CardTitle,
         )
 
         Spacer(Modifier.height(4.dp))
@@ -291,7 +280,7 @@ private fun FullWarningCard(warning: Warning) {
         Text(
             text = "Telemetry report: ${warning.severity.name.lowercase()} level advisory.",
             color = VargTextSecondary,
-            fontSize = 12.sp,
+            style = StarkTypographyTokens.CardSubtitle,
         )
     }
 }

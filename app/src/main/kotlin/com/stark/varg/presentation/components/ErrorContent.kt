@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.stark.varg.ui.theme.StarkBackground
 import com.stark.varg.ui.theme.StarkRed
 import com.stark.varg.ui.theme.StarkTextPrimary
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.StarkWhite
 
 @Composable
@@ -51,16 +52,14 @@ fun ErrorContent(
                 Text(
                     text = "CONNECTION ERROR",
                     color = StarkRed,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
+                    style = StarkTypographyTokens.TechnicalHeader.copy(color = StarkRed),
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
                     text = message,
                     color = StarkTextPrimary,
                     textAlign = TextAlign.Center,
-                    fontSize = 15.sp,
+                    style = StarkTypographyTokens.BodyRegular,
                     modifier = Modifier.testTag("error_message"),
                 )
                 Spacer(Modifier.height(24.dp))
@@ -77,8 +76,7 @@ fun ErrorContent(
                 ) {
                     Text(
                         text = "RETRY CONNECTION",
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.ButtonLabel.copy(color = StarkWhite),
                     )
                 }
             }

@@ -29,9 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.BatteryStatus
 import com.stark.varg.domain.model.ChargingState
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPillDark
+import com.stark.varg.ui.theme.VargPitchBlack
 import com.stark.varg.ui.theme.VargStarkRed
 import com.stark.varg.ui.theme.VargTextPrimary
 import com.stark.varg.ui.theme.VargTextSecondary
@@ -79,9 +81,7 @@ fun BatteryCard(
                 Text(
                     text = "ESTIMATED AUTONOMY & BATTERY",
                     color = VargTextSecondary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp,
+                    style = StarkTypographyTokens.TechnicalHeader,
                 )
                 StarkPill(
                     text = chargingLabel,
@@ -99,22 +99,18 @@ fun BatteryCard(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Range Hero (Priority 1)
+                // Range Hero
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "${battery.estimatedRangeKm} km",
                         color = VargWhite,
-                        fontSize = 38.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-1.5).sp,
+                        style = StarkTypographyTokens.MetricLarge,
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = "RANGE LEFT",
                         color = VargTextSecondary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.TechnicalLabel,
                     )
                 }
 
@@ -136,18 +132,14 @@ fun BatteryCard(
                         Text(
                             text = "${battery.stateOfChargePct}%",
                             color = VargWhite,
-                            fontSize = 38.sp,
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = (-1.5).sp,
+                            style = StarkTypographyTokens.MetricLarge,
                         )
                     }
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = "BATTERY CHARGE",
                         color = VargTextSecondary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.TechnicalLabel,
                     )
                 }
             }
@@ -176,9 +168,7 @@ fun BatteryCard(
                 Text(
                     text = "CHARGE TARGET",
                     color = VargTextSecondary,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.8.sp,
+                    style = StarkTypographyTokens.TechnicalLabel,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("80%", "90%", "100%").forEach { limit ->
@@ -200,9 +190,10 @@ fun BatteryCard(
                         ) {
                             Text(
                                 text = limit,
-                                color = if (isSelected) com.stark.varg.ui.theme.VargPitchBlack else VargWhite,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) VargPitchBlack else VargWhite,
+                                style = StarkTypographyTokens.PillLabel.copy(
+                                    color = if (isSelected) VargPitchBlack else VargWhite,
+                                ),
                             )
                         }
                     }
@@ -225,12 +216,11 @@ fun BatteryCard(
                         .padding(horizontal = 10.dp, vertical = 6.dp),
                 ) {
                     Column {
-                        Text(text = "TEMP", color = VargTextSecondary, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "TEMP", color = VargTextSecondary, style = StarkTypographyTokens.ScaleTick)
                         Text(
                             text = "${battery.temperatureC}°C",
                             color = VargWhite,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = StarkTypographyTokens.ValueMedium,
                         )
                     }
                 }
@@ -244,12 +234,11 @@ fun BatteryCard(
                         .padding(horizontal = 10.dp, vertical = 6.dp),
                 ) {
                     Column {
-                        Text(text = "HEALTH", color = VargTextSecondary, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "HEALTH", color = VargTextSecondary, style = StarkTypographyTokens.ScaleTick)
                         Text(
                             text = "99% Optimal",
                             color = VargElectricGreen,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = StarkTypographyTokens.ValueMedium.copy(color = VargElectricGreen),
                         )
                     }
                 }
@@ -263,12 +252,11 @@ fun BatteryCard(
                         .padding(horizontal = 10.dp, vertical = 6.dp),
                 ) {
                     Column {
-                        Text(text = "POWER", color = VargTextSecondary, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "POWER", color = VargTextSecondary, style = StarkTypographyTokens.ScaleTick)
                         Text(
                             text = battery.chargingState.name.lowercase().replaceFirstChar { it.uppercase() },
                             color = VargWhite,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = StarkTypographyTokens.ValueMedium,
                         )
                     }
                 }
@@ -276,7 +264,7 @@ fun BatteryCard(
 
             Spacer(Modifier.height(12.dp))
 
-            // Battery Options / Health Modal Button (Photo 4)
+            // Battery Options / Health Modal Button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -296,8 +284,7 @@ fun BatteryCard(
                     Text(
                         text = "Advanced Battery Management & Diagnostics",
                         color = VargTextPrimary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = StarkTypographyTokens.CardSubtitle,
                     )
                 }
 
@@ -305,9 +292,7 @@ fun BatteryCard(
                     Text(
                         text = "OPTIONS ›",
                         color = VargElectricGreen,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp,
+                        style = StarkTypographyTokens.TechnicalLabel.copy(color = VargElectricGreen),
                     )
                 }
             }

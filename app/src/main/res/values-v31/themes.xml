@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#030405</item>
+        <item name="android:windowSplashScreenBackground">#030405</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/stark_splash_icon</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/stark_splash_icon</item>
+        <item name="postSplashScreenTheme">@style/Theme.StarkTechnicalApplication</item>
+    </style>
+
+    <style name="Theme.StarkTechnicalApplication" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@drawable/stark_splash</item>
+        <item name="android:statusBarColor">#030405</item>
+        <item name="android:navigationBarColor">#030405</item>
+        <item name="android:windowSplashScreenBackground">#030405</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/stark_splash_icon</item>
+    </style>
+</resources>

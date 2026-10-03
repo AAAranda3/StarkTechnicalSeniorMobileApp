@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.BatteryStatus
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargCyan
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -56,7 +57,7 @@ fun BatteryScreen(
             .background(VargPitchBlack)
             .padding(horizontal = 16.dp),
     ) {
-        // Standard Navigation TopAppBar (No cutre buttons)
+        // Standard Navigation TopAppBar
         VargScreenTopAppBar(
             title = "BATTERY & CHARGING",
             subtitle = "State: ${battery.chargingState.name.lowercase()}",
@@ -153,13 +154,20 @@ private fun BatteryHeroCard(battery: BatteryStatus) {
                 )
             }
             Spacer(Modifier.width(10.dp))
-            Text(
-                text = "${battery.stateOfChargePct}%",
-                color = VargWhite,
-                fontSize = 38.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-1).sp,
-            )
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = "${battery.stateOfChargePct}",
+                    color = VargWhite,
+                    style = StarkTypographyTokens.MetricLarge,
+                )
+                Spacer(Modifier.width(2.dp))
+                Text(
+                    text = "%",
+                    color = VargElectricGreen,
+                    style = StarkTypographyTokens.MetricUnit,
+                    modifier = Modifier.padding(bottom = 3.dp),
+                )
+            }
         }
 
         Spacer(Modifier.height(4.dp))
@@ -167,9 +175,7 @@ private fun BatteryHeroCard(battery: BatteryStatus) {
         Text(
             text = "${battery.estimatedRangeKm} KM ESTIMATED AUTONOMY",
             color = VargElectricGreen,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            style = StarkTypographyTokens.TechnicalHeader,
         )
 
         Spacer(Modifier.height(16.dp))
@@ -204,19 +210,24 @@ private fun BatteryMetricsRow(battery: BatteryStatus) {
                 .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
                 .padding(16.dp),
         ) {
-            Text(
-                text = "${battery.temperatureC}°C",
-                color = VargSecondary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = "${battery.temperatureC}",
+                    color = VargSecondary,
+                    style = StarkTypographyTokens.MetricMedium,
+                )
+                Spacer(Modifier.width(2.dp))
+                Text(
+                    text = "°C",
+                    color = VargSecondary,
+                    style = StarkTypographyTokens.MetricUnit,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                )
+            }
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "PACK TEMPERATURE",
-                color = VargTextSecondary,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalHeader,
             )
         }
 
@@ -228,18 +239,14 @@ private fun BatteryMetricsRow(battery: BatteryStatus) {
                 .padding(16.dp),
         ) {
             Text(
-                text = battery.chargingState.name,
+                text = battery.chargingState.name.uppercase(),
                 color = VargWhite,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = StarkTypographyTokens.MetricSmall,
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "CHARGING STATE",
-                color = VargTextSecondary,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalHeader,
             )
         }
     }
@@ -262,9 +269,7 @@ private fun BatteryTargetCard(
         Text(
             text = "TARGET CHARGE LIMIT",
             color = VargWhite,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            style = StarkTypographyTokens.TechnicalHeader,
         )
 
         Row(
@@ -292,8 +297,9 @@ private fun BatteryTargetCard(
                     Text(
                         text = "$target%",
                         color = if (isSelected) VargPitchBlack else VargTextSecondary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.PillLabel.copy(
+                            color = if (isSelected) VargPitchBlack else VargTextSecondary,
+                        ),
                     )
                 }
             }
@@ -304,8 +310,8 @@ private fun BatteryTargetCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Telemetry Timestamp", color = VargTextSecondary, fontSize = 12.sp)
-            Text(timestamp, color = VargTextSecondary, fontSize = 11.sp)
+            Text("Telemetry Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(timestamp, color = VargTextSecondary, style = StarkTypographyTokens.ScaleTick)
         }
     }
 }

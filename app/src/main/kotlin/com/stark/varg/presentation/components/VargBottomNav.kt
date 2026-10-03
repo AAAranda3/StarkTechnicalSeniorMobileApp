@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargPitchBlack
 import com.stark.varg.ui.theme.VargTextPrimary
 import com.stark.varg.ui.theme.VargTextSecondary
@@ -48,7 +49,7 @@ fun VargBottomNav(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Tab 1: Vehicle (Home)
+        // Vehicle Tab (Home)
         VargBottomNavItem(
             label = "Vehicle",
             isActive = activeTab == "home",
@@ -74,7 +75,7 @@ fun VargBottomNav(
             },
         )
 
-        // Tab 2: Telemetry
+        // Telemetry Tab
         VargBottomNavItem(
             label = "Telemetry",
             isActive = activeTab == "stats",
@@ -84,7 +85,7 @@ fun VargBottomNav(
             },
         )
 
-        // Tab 3: Modes
+        // Modes Tab
         VargBottomNavItem(
             label = "Modes",
             isActive = activeTab == "modes",
@@ -94,7 +95,7 @@ fun VargBottomNav(
             },
         )
 
-        // Tab 4: Profile
+        // Profile Tab
         VargBottomNavItem(
             label = "Profile",
             isActive = activeTab == "profile",
@@ -146,8 +147,7 @@ private fun VargBottomNavItem(
             Text(
                 text = label,
                 color = contentColor,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
+                style = StarkTypographyTokens.PillLabel,
             )
         }
     } else {
@@ -163,8 +163,7 @@ private fun VargBottomNavItem(
             Text(
                 text = label,
                 color = contentColor,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Normal,
+                style = StarkTypographyTokens.ScaleTick,
             )
         }
     }

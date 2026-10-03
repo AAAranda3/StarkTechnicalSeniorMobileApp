@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorder
 import com.stark.varg.ui.theme.VargPillBorder
 import com.stark.varg.ui.theme.VargPillDark
@@ -55,8 +56,7 @@ fun StarkPill(
         Text(
             text = text,
             color = textColor,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
+            style = StarkTypographyTokens.PillLabel.copy(color = textColor),
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
     }

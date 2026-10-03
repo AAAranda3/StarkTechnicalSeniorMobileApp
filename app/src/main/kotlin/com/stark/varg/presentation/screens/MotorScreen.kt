@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,6 +30,7 @@ import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
 import com.stark.varg.presentation.components.VargPrecisionMeter
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
@@ -58,7 +60,7 @@ fun MotorScreen(
             .background(VargPitchBlack)
             .padding(horizontal = 16.dp),
     ) {
-        // Standard Navigation TopAppBar (No cutre buttons)
+        // Standard Navigation TopAppBar
         VargScreenTopAppBar(
             title = "MOTOR & POWERTRAIN",
             subtitle = "Active Map: ${settings.powerMap.uppercase()}",
@@ -161,20 +163,24 @@ private fun MotorTempRow(
                 .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
                 .padding(16.dp),
         ) {
-            Text(
-                text = "${motor.temperatureC}°C",
-                color = tempColor,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.5).sp,
-            )
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = "${motor.temperatureC}",
+                    color = tempColor,
+                    style = StarkTypographyTokens.MetricMedium,
+                )
+                Spacer(Modifier.width(3.dp))
+                Text(
+                    text = "°C",
+                    color = tempColor,
+                    style = StarkTypographyTokens.MetricUnit,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                )
+            }
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "CORE TEMPERATURE",
-                color = VargTextSecondary,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalHeader,
             )
         }
 
@@ -185,20 +191,24 @@ private fun MotorTempRow(
                 .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
                 .padding(16.dp),
         ) {
-            Text(
-                text = "${settings.maxPowerHp} HP",
-                color = VargWhite,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.5).sp,
-            )
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = "${settings.maxPowerHp}",
+                    color = VargWhite,
+                    style = StarkTypographyTokens.MetricMedium,
+                )
+                Spacer(Modifier.width(3.dp))
+                Text(
+                    text = "HP",
+                    color = VargSecondary,
+                    style = StarkTypographyTokens.MetricUnit,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                )
+            }
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "CALIBRATED MAX POWER",
-                color = VargTextSecondary,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.TechnicalHeader,
             )
         }
     }
@@ -219,50 +229,47 @@ private fun MotorConfigCard(
     ) {
         Text(
             text = "CONFIGURED MOTOR PARAMETERS",
-            color = VargWhite,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
+            style = StarkTypographyTokens.TechnicalHeader,
         )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Power Map", color = VargTextSecondary, fontSize = 13.sp)
-            Text(settings.powerMap.uppercase(), color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Power Map", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(settings.powerMap.uppercase(), color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Configured Max Power", color = VargTextSecondary, fontSize = 13.sp)
-            Text("${settings.maxPowerHp} HP", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Configured Max Power", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("${settings.maxPowerHp} HP", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Engine Braking Setting", color = VargTextSecondary, fontSize = 13.sp)
-            Text("${settings.engineBrakingPct}%", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Engine Braking Setting", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("${settings.engineBrakingPct}%", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Regeneration Setting", color = VargTextSecondary, fontSize = 13.sp)
-            Text("${settings.regenPct}%", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("Regeneration Setting", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text("${settings.regenPct}%", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Timestamp", color = VargTextSecondary, fontSize = 13.sp)
-            Text(timestamp, color = VargTextSecondary, fontSize = 11.sp)
+            Text("Telemetry Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(timestamp, color = VargTextSecondary, style = StarkTypographyTokens.ScaleTick)
         }
     }
 }

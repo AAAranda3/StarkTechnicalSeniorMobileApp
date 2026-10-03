@@ -110,7 +110,7 @@ class TelemetryViewModel @Inject constructor(
         val mode = _selectedMode.value
         val current = _modeProfiles.value[mode] ?: PowerModeProfile(hp, 45, 60)
         val updated = current.copy(maxPowerHp = hp)
-        _modeProfiles.value = _modeProfiles.value + (mode to updated)
+        _modeProfiles.value += (mode to updated)
         _maxPowerHp.value = hp
     }
 
@@ -118,7 +118,7 @@ class TelemetryViewModel @Inject constructor(
         val mode = _selectedMode.value
         val current = _modeProfiles.value[mode] ?: PowerModeProfile(80, pct, 60)
         val updated = current.copy(engineBrakingPct = pct)
-        _modeProfiles.value = _modeProfiles.value + (mode to updated)
+        _modeProfiles.value += (mode to updated)
         _engineBrakingPct.value = pct
     }
 
@@ -126,7 +126,7 @@ class TelemetryViewModel @Inject constructor(
         val mode = _selectedMode.value
         val current = _modeProfiles.value[mode] ?: PowerModeProfile(80, 45, pct)
         val updated = current.copy(regenPct = pct)
-        _modeProfiles.value = _modeProfiles.value + (mode to updated)
+        _modeProfiles.value += (mode to updated)
         _regenPct.value = pct
     }
 

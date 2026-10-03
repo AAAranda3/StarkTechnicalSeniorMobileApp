@@ -34,6 +34,7 @@ import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
 import com.stark.varg.domain.model.SessionData
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargCyan
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -46,7 +47,7 @@ import com.stark.varg.ui.theme.VargWarningAmber
 import com.stark.varg.ui.theme.VargWhite
 
 /**
- * Handlebar Cockpit Grid in Landscape mode matching "THE NEW VARG APP 3.0" photo.
+ * Handlebar Cockpit Grid in Landscape mode.
  * Strictly uses data from JSON with unified monochrome Gris / Blanco icons.
  */
 @Composable
@@ -86,23 +87,18 @@ fun LandscapeCockpitGrid(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Left: Signature VARG brush script + Trip Summary
+            // Left: Signature VARG brand + Trip Summary
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "VARG",
                     color = VargWhite,
-                    fontSize = 20.sp,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 3.sp,
-                    fontFamily = FontFamily.Cursive,
+                    style = StarkTypographyTokens.BrandTitle,
                 )
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = "$durationFormatted  ${session.distanceKm} km",
                     color = VargWhite,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
+                    style = StarkTypographyTokens.CardSubtitle.copy(color = VargWhite),
                 )
                 Spacer(Modifier.width(8.dp))
                 Box(
@@ -114,14 +110,13 @@ fun LandscapeCockpitGrid(
                 Text(
                     text = "Connected",
                     color = VargTextSecondary,
-                    fontSize = 11.sp,
+                    style = StarkTypographyTokens.ScaleTick,
                 )
                 Spacer(Modifier.width(12.dp))
                 Text(
                     text = bike.model,
                     color = VargTextSecondary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal,
+                    style = StarkTypographyTokens.ScaleTick,
                 )
             }
 
@@ -142,15 +137,17 @@ fun LandscapeCockpitGrid(
                         Text(
                             text = "⚡ ${battery.stateOfChargePct}%",
                             color = VargPitchBlack,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Black,
+                            style = StarkTypographyTokens.ScaleTick.copy(
+                                color = VargPitchBlack,
+                                fontWeight = FontWeight.SemiBold,
+                            ),
                         )
                     }
                 }
             }
         }
 
-        // Row 1: 4 Primary Cockpit Tiles in a Grid with Gris / Blanco Icons
+        // Primary Cockpit Tiles Grid
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -195,12 +192,12 @@ fun LandscapeCockpitGrid(
             )
         }
 
-        // Row 2: 2 Wider Grid Cards (Trip History & Autonomy Status)
+        // Wider Grid Cards (Trip History & Autonomy Status)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            // Card 1: Session Telemetry
+            // Session Telemetry Card
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -220,31 +217,27 @@ fun LandscapeCockpitGrid(
                             VargIconStats(color = VargTextSecondary, sizeDp = 14.dp)
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                text = "TRIP TELEMETRY",
-                                color = VargTextSecondary,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 0.5.sp,
+                                 text = "TRIP TELEMETRY",
+                                 color = VargTextSecondary,
+                                 style = StarkTypographyTokens.TechnicalLabel,
                             )
                         }
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = "${session.distanceKm} km  •  $durationFormatted",
                             color = VargWhite,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = StarkTypographyTokens.ValueMedium,
                         )
                     }
                     Text(
                         text = "MAX ${session.maxSpeedKmh} KM/H",
                         color = VargElectricGreen,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.TechnicalLabel.copy(color = VargElectricGreen),
                     )
                 }
             }
 
-            // Card 2: Autonomy & Battery Pack Status
+            // Autonomy & Battery Pack Status Card
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -263,23 +256,19 @@ fun LandscapeCockpitGrid(
                         Text(
                             text = "AUTONOMY & BATTERY",
                             color = VargTextSecondary,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp,
+                            style = StarkTypographyTokens.TechnicalLabel,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = "${battery.estimatedRangeKm} km  •  ${battery.stateOfChargePct}%",
                             color = VargWhite,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = StarkTypographyTokens.ValueMedium,
                         )
                     }
                     Text(
                         text = "${battery.temperatureC}°C",
                         color = VargCyan,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = StarkTypographyTokens.TechnicalLabel.copy(color = VargCyan),
                     )
                 }
             }
@@ -305,15 +294,13 @@ fun LandscapeCockpitGrid(
                     Text(
                         text = alertMessage,
                         color = VargWhite,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = StarkTypographyTokens.CardSubtitle.copy(color = VargWhite),
                     )
                 }
                 Text(
                     text = "DETAILS ➔",
                     color = alertAccent,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = StarkTypographyTokens.TechnicalLabel.copy(color = alertAccent),
                 )
             }
         }
@@ -342,7 +329,7 @@ private fun CockpitTile(
             Box(
                 modifier = Modifier
                     .size(32.dp)
-                    .background(Color(0xFF363844), CircleShape),
+                    .background(Color(0xFF1C1C22), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 iconContent()
@@ -353,9 +340,7 @@ private fun CockpitTile(
             Text(
                 text = title,
                 color = VargWhite,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.5.sp,
+                style = StarkTypographyTokens.CardTitle,
             )
 
             Spacer(Modifier.height(2.dp))
@@ -363,7 +348,7 @@ private fun CockpitTile(
             Text(
                 text = subtitle,
                 color = VargTextSecondary,
-                fontSize = 9.sp,
+                style = StarkTypographyTokens.ScaleTick,
                 maxLines = 1,
             )
         }

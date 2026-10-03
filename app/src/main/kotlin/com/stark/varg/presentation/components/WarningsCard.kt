@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargStarkRed
 import com.stark.varg.ui.theme.VargWarningAmber
 import com.stark.varg.ui.theme.VargWhite
@@ -72,8 +73,7 @@ fun WarningsCard(
             Text(
                 text = friendlyMessage,
                 color = VargWhite,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
+                style = StarkTypographyTokens.CardTitle,
                 maxLines = 1,
             )
         }

@@ -35,21 +35,21 @@ fun VargIconStats(
         val barW = w * 0.22f
         val radius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
 
-        // Bar 1 (Short)
+        // Short bar
         drawRoundRect(
             color = color,
             topLeft = Offset(w * 0.08f, h * 0.55f),
             size = Size(barW, h * 0.42f),
             cornerRadius = radius,
         )
-        // Bar 2 (Medium)
+        // Medium bar
         drawRoundRect(
             color = color,
             topLeft = Offset(w * 0.39f, h * 0.25f),
             size = Size(barW, h * 0.72f),
             cornerRadius = radius,
         )
-        // Bar 3 (Tall)
+        // Tall bar
         drawRoundRect(
             color = color,
             topLeft = Offset(w * 0.70f, h * 0.05f),
