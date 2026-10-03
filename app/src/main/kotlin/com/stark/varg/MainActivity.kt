@@ -1,6 +1,9 @@
 package com.stark.varg
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.stark.varg.presentation.TelemetryScreen
 import com.stark.varg.presentation.screens.SplashScreen
@@ -20,9 +24,20 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        // Immediately dismiss the system window splash so our Compose splash screen takes over smoothly
+        // Seamless exit animation: smoothly fade out the corporate system splash
+        // into the cinematic Compose splash without any abrupt visual jumps
         splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
-            splashScreenViewProvider.remove()
+            val fadeOut = ObjectAnimator.ofFloat(
+                splashScreenViewProvider.view,
+                View.ALPHA,
+                1f,
+                0f,
+            ).apply {
+                interpolator = AccelerateDecelerateInterpolator()
+                duration = 380L
+                doOnEnd { splashScreenViewProvider.remove() }
+            }
+            fadeOut.start()
         }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

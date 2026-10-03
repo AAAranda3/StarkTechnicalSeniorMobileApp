@@ -64,6 +64,7 @@ fun SplashScreen(
     onSplashFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val heroAlpha = remember { Animatable(0f) }
     val hudAlpha = remember { Animatable(0f) }
     val progressAnim = remember { Animatable(0f) }
     var statusText by remember { mutableStateOf("INITIALIZING CAN BUS...") }
@@ -81,6 +82,14 @@ fun SplashScreen(
     )
 
     LaunchedEffect(Unit) {
+        // Smooth entrance of the motorcycle visual from the dark obsidian background
+        launch {
+            heroAlpha.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+            )
+        }
+
         // Entrance animation of telemetry HUD overlay
         launch {
             hudAlpha.animateTo(
@@ -118,11 +127,13 @@ fun SplashScreen(
                 onSplashFinished()
             },
     ) {
-        // Full screen motorcycle hero visual occupying practically the entire space
+        // Full screen motorcycle hero visual smoothly fading in
         Image(
             painter = painterResource(id = R.drawable.stark_splash),
             contentDescription = "Stark Varg",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(heroAlpha.value),
             contentScale = ContentScale.Crop,
         )
 
