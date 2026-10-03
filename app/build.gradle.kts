@@ -70,6 +70,7 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     implementation(libs.coil.compose)
+    implementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)

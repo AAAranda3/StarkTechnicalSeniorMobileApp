@@ -4,9 +4,11 @@ import android.content.Context
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.stark.varg.data.repository.TelemetryRepositoryImpl
+import com.stark.varg.data.repository.UserPreferencesRepositoryImpl
 import com.stark.varg.data.source.LocalTelemetryDataSource
 import com.stark.varg.data.source.TelemetryDataSource
 import com.stark.varg.domain.repository.TelemetryRepository
+import com.stark.varg.domain.repository.UserPreferencesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,4 +38,10 @@ object TelemetryModule {
     fun provideTelemetryRepository(
         dataSource: TelemetryDataSource,
     ): TelemetryRepository = TelemetryRepositoryImpl(dataSource)
+
+    @Provides
+    @Singleton
+    fun provideUserPreferencesRepository(
+        @ApplicationContext context: Context,
+    ): UserPreferencesRepository = UserPreferencesRepositoryImpl(context)
 }

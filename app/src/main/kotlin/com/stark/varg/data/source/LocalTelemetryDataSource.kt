@@ -14,6 +14,8 @@ class LocalTelemetryDataSource @Inject constructor(
 ) : TelemetryDataSource {
 
     override suspend fun fetchSnapshot(): TelemetryDto = withContext(Dispatchers.IO) {
+        // Simulate vehicle CAN bus / network handshake latency so the user experiences the high-tech skeleton loading process
+        kotlinx.coroutines.delay(950L)
         val json = context.assets.open("telemetry_snapshot.json")
             .bufferedReader()
             .use { it.readText() }
