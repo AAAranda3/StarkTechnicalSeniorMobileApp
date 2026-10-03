@@ -1,22 +1,32 @@
 package com.stark.varg.presentation
 
 import app.cash.turbine.test
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.BatteryStatus
 import com.stark.varg.domain.model.BikeInfo
 import com.stark.varg.domain.model.ChargingState
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
+import com.stark.varg.domain.model.SavedPowerMode
 import com.stark.varg.domain.model.SessionData
 import com.stark.varg.domain.model.TelemetrySnapshot
+import com.stark.varg.domain.model.UnitSystem
+import com.stark.varg.domain.model.UserPreferences
 import com.stark.varg.domain.model.Warning
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.domain.repository.UserPreferencesRepository
 import com.stark.varg.domain.usecase.GetTelemetryUseCase
+import com.stark.varg.domain.usecase.ObserveLiveTelemetryUseCase
 import com.stark.varg.util.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -25,6 +35,35 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
+class FakeUserPreferencesRepository(
+    initialPreferences: UserPreferences = UserPreferences(),
+) : UserPreferencesRepository {
+    private val _prefs = MutableStateFlow(initialPreferences)
+    override val preferencesFlow: Flow<UserPreferences> = _prefs.asStateFlow()
+
+    override suspend fun saveSelectedMode(mode: String) {
+        _prefs.value = _prefs.value.copy(selectedMode = mode)
+    }
+
+    override suspend fun savePowerModeProfile(mode: String, profile: SavedPowerMode) {
+        val updated = _prefs.value.modeProfiles.toMutableMap()
+        updated[mode] = profile
+        _prefs.value = _prefs.value.copy(modeProfiles = updated)
+    }
+
+    override suspend fun saveChargeTargetPct(targetPct: Int) {
+        _prefs.value = _prefs.value.copy(chargeTargetPct = targetPct)
+    }
+
+    override suspend fun saveUnitSystem(unitSystem: UnitSystem) {
+        _prefs.value = _prefs.value.copy(unitSystem = unitSystem)
+    }
+
+    override suspend fun saveLanguage(language: AppLanguage) {
+        _prefs.value = _prefs.value.copy(language = language)
+    }
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class TelemetryViewModelTest {
 
@@ -32,6 +71,13 @@ class TelemetryViewModelTest {
     val mainDispatcherRule = MainDispatcherRule(StandardTestDispatcher())
 
     private val getTelemetryUseCase: GetTelemetryUseCase = mockk()
+    private val observeLiveTelemetryUseCase: ObserveLiveTelemetryUseCase = mockk(relaxed = true)
+    private var fakeUserPreferencesRepository = FakeUserPreferencesRepository()
+
+    private fun createViewModel(
+        userPreferencesRepository: UserPreferencesRepository = fakeUserPreferencesRepository,
+        observeLiveTelemetry: ObserveLiveTelemetryUseCase = observeLiveTelemetryUseCase,
+    ): TelemetryViewModel = TelemetryViewModel(getTelemetryUseCase, userPreferencesRepository, observeLiveTelemetry)
 
     private fun buildSnapshot(warnings: List<Warning> = listOf(
         Warning("W_MOT_TEMP_HIGH", "Motor temperature elevated", WarningSeverity.WARNING),
@@ -52,7 +98,7 @@ class TelemetryViewModelTest {
         val snapshot = buildSnapshot()
         coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TelemetryUiState.Loading, awaitItem())
@@ -70,7 +116,7 @@ class TelemetryViewModelTest {
             Result.success(snapshot),
         )
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
 
         viewModel.uiState.test {
             assertEquals(TelemetryUiState.Loading, awaitItem())
@@ -92,7 +138,7 @@ class TelemetryViewModelTest {
     fun `usecase failure emits Error with exception message`() = runTest {
         coEvery { getTelemetryUseCase() } returns Result.failure(RuntimeException("Parse failed"))
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         assertEquals(TelemetryUiState.Error("Parse failed"), viewModel.uiState.value)
@@ -102,7 +148,7 @@ class TelemetryViewModelTest {
     fun `usecase failure with null message emits Unknown error`() = runTest {
         coEvery { getTelemetryUseCase() } returns Result.failure(RuntimeException())
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         assertEquals(TelemetryUiState.Error("Unknown error"), viewModel.uiState.value)
@@ -117,7 +163,7 @@ class TelemetryViewModelTest {
             Result.success(buildSnapshot())
         }
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
 
         assertEquals(TelemetryUiState.Loading, viewModel.uiState.value)
     }
@@ -127,7 +173,7 @@ class TelemetryViewModelTest {
         val snapshot = buildSnapshot(warnings = emptyList())
         coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value as TelemetryUiState.Success
@@ -139,7 +185,7 @@ class TelemetryViewModelTest {
         val snapshot = buildSnapshot()
         coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
 
-        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         // Initial active mode is M3 (80 HP, 45% Engine Braking, 60% Regen)
@@ -185,5 +231,171 @@ class TelemetryViewModelTest {
         // Switch back to M1: M1 MUST still have 42 HP
         viewModel.selectMode("M1")
         assertEquals(42, viewModel.maxPowerHp.value)
+    }
+
+    @Test
+    fun `toggleCharging switches chargingState to CHARGING and back to DISCHARGING`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.isCharging.value)
+
+        // Toggle to start charging
+        viewModel.toggleCharging()
+        assertTrue(viewModel.isCharging.value)
+        val state1 = viewModel.uiState.value as TelemetryUiState.Success
+        assertEquals(ChargingState.CHARGING, state1.snapshot.battery.chargingState)
+
+        // Toggle to stop charging
+        viewModel.toggleCharging()
+        assertEquals(false, viewModel.isCharging.value)
+        val state2 = viewModel.uiState.value as TelemetryUiState.Success
+        assertEquals(ChargingState.DISCHARGING, state2.snapshot.battery.chargingState)
+    }
+
+    @Test
+    fun `refreshTelemetry resets uiState to Loading then loads snapshot`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            assertEquals(TelemetryUiState.Success(snapshot), awaitItem())
+
+            viewModel.refreshTelemetry()
+
+            assertEquals(TelemetryUiState.Loading, awaitItem())
+            advanceUntilIdle()
+            assertEquals(TelemetryUiState.Success(snapshot), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // --- Persistence cases ----------------------------------------------------
+
+    @Test
+    fun `preferences flow updates selectedMode and custom power profiles in viewModel`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.selectMode("M2")
+        viewModel.updateMaxPower(48)
+        advanceUntilIdle()
+
+        fakeUserPreferencesRepository.preferencesFlow.test {
+            val latest = awaitItem()
+            assertEquals("M2", latest.selectedMode)
+            assertEquals(48, latest.modeProfiles["M2"]?.maxPowerHp)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `toggleUnitSystem alternates between METRIC and IMPERIAL and persists`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(UnitSystem.METRIC, viewModel.unitSystem.value)
+
+        viewModel.toggleUnitSystem()
+        advanceUntilIdle()
+        assertEquals(UnitSystem.IMPERIAL, viewModel.unitSystem.value)
+
+        viewModel.toggleUnitSystem()
+        advanceUntilIdle()
+        assertEquals(UnitSystem.METRIC, viewModel.unitSystem.value)
+    }
+
+    // --- Live Stream cases ----------------------------------------------------
+
+    @Test
+    fun `toggleLiveStream toggles stream state and collects live snapshots`() = runTest {
+        val initialSnapshot = buildSnapshot()
+        val liveSnapshot = buildSnapshot().copy(
+            motor = MotorStatus(75.0, 68.0),
+            session = SessionData(3800, 25.1, 102.5),
+        )
+
+        coEvery { getTelemetryUseCase() } returns Result.success(initialSnapshot)
+        coEvery { observeLiveTelemetryUseCase() } returns flowOf(liveSnapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.isLiveStreamActive.value)
+
+        viewModel.toggleLiveStream()
+        advanceUntilIdle()
+
+        assertEquals(true, viewModel.isLiveStreamActive.value)
+        val state = viewModel.uiState.value
+        assertTrue(state is TelemetryUiState.Success)
+        assertEquals(75.0, (state as TelemetryUiState.Success).snapshot.motor.powerHp, 0.01)
+
+        // Toggle again to stop
+        viewModel.toggleLiveStream()
+        advanceUntilIdle()
+        assertEquals(false, viewModel.isLiveStreamActive.value)
+    }
+
+    @Test
+    fun `selectLanguage updates language and saves to repository`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(AppLanguage.SPANISH, viewModel.language.value)
+
+        viewModel.selectLanguage(AppLanguage.ENGLISH)
+        advanceUntilIdle()
+
+        assertEquals(AppLanguage.ENGLISH, viewModel.language.value)
+    }
+
+    @Test
+    fun `navigateTo Settings updates currentDestination and navigateBack returns to Dashboard`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(TelemetryDestination.Dashboard, viewModel.currentDestination.value)
+
+        viewModel.navigateTo(TelemetryDestination.Settings)
+        assertEquals(TelemetryDestination.Settings, viewModel.currentDestination.value)
+
+        viewModel.navigateBack()
+        assertEquals(TelemetryDestination.Dashboard, viewModel.currentDestination.value)
+    }
+
+    @Test
+    fun `restoreFactoryModes resets customized power modes to factory defaults`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.updateMaxPower(40)
+        advanceUntilIdle()
+        assertEquals(40, viewModel.maxPowerHp.value)
+
+        viewModel.restoreFactoryModes()
+        advanceUntilIdle()
+        assertEquals(80, viewModel.maxPowerHp.value)
     }
 }
