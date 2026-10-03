@@ -1,0 +1,282 @@
+package com.stark.varg.presentation.screens
+
+import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.SessionData
+import com.stark.varg.presentation.components.CircuitTelemetryCard
+import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.ui.theme.VargBorderSubtle
+import com.stark.varg.ui.theme.VargElectricGreen
+import com.stark.varg.ui.theme.VargPitchBlack
+import com.stark.varg.ui.theme.VargSurfaceCard
+import com.stark.varg.ui.theme.VargTextSecondary
+import com.stark.varg.ui.theme.VargWhite
+
+@Composable
+fun StatsScreen(
+    session: SessionData,
+    timestamp: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val avgSpeed = if (session.durationS > 0) {
+        val hours = session.durationS / 3600.0
+        "%.1f km/h".format(session.distanceKm / hours)
+    } else {
+        "-- km/h"
+    }
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(VargPitchBlack)
+            .padding(horizontal = 16.dp),
+    ) {
+        // Standard Navigation TopAppBar
+        VargScreenTopAppBar(
+            title = "SESSION STATISTICS",
+            subtitle = "Recorded Trip Metrics",
+            onBack = onBack,
+            statusText = "RECORDED",
+            statusColor = Color(0xFFD4D4DC),
+        )
+
+        if (isLandscape) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                // Left Column: 2x2 Grid & Session Metadata Log
+                Column(
+                    modifier = Modifier
+                        .weight(0.48f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        MetricCard(
+                            label = "TOTAL DISTANCE",
+                            value = "${session.distanceKm} km",
+                            modifier = Modifier.weight(1f),
+                        )
+                        MetricCard(
+                            label = "MAX SPEED",
+                            value = "${session.maxSpeedKmh} km/h",
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        MetricCard(
+                            label = "SESSION TIME",
+                            value = formatFullDuration(session.durationS),
+                            modifier = Modifier.weight(1f),
+                        )
+                        MetricCard(
+                            label = "AVERAGE SPEED",
+                            value = avgSpeed,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+
+                    SessionLogCard(session = session, timestamp = timestamp)
+                }
+
+                // Right Column: Motocross / Race Track GPS Circuit Telemetry Visualizer
+                Column(
+                    modifier = Modifier
+                        .weight(0.52f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    CircuitTelemetryCard(session = session)
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 24.dp),
+            ) {
+                Spacer(Modifier.height(8.dp))
+
+                // Primary 2x2 Grid strictly from session JSON
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    MetricCard(
+                        label = "TOTAL DISTANCE",
+                        value = "${session.distanceKm} km",
+                        modifier = Modifier.weight(1f),
+                    )
+                    MetricCard(
+                        label = "MAX SPEED",
+                        value = "${session.maxSpeedKmh} km/h",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    MetricCard(
+                        label = "SESSION TIME",
+                        value = formatFullDuration(session.durationS),
+                        modifier = Modifier.weight(1f),
+                    )
+                    MetricCard(
+                        label = "AVERAGE SPEED",
+                        value = avgSpeed,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                Spacer(Modifier.height(14.dp))
+
+                // Motocross / Race Track GPS Circuit Telemetry Visualizer
+                CircuitTelemetryCard(session = session)
+
+                Spacer(Modifier.height(14.dp))
+
+                // Session Metadata & Telemetry Log (Non-redundant technical details)
+                SessionLogCard(session = session, timestamp = timestamp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SessionLogCard(
+    session: SessionData,
+    timestamp: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(ColorDarkTile, RoundedCornerShape(14.dp))
+            .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = "SESSION METADATA & TELEMETRY LOG",
+            color = VargWhite,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Recorded Timestamp", color = VargTextSecondary, fontSize = 13.sp)
+            Text(timestamp, color = VargWhite, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Raw Elapsed Duration", color = VargTextSecondary, fontSize = 13.sp)
+            Text("${session.durationS} seconds", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Distance Logged", color = VargTextSecondary, fontSize = 13.sp)
+            Text("${(session.distanceKm * 1000).toInt()} meters", color = VargWhite, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Telemetry Sync Status", color = VargTextSecondary, fontSize = 13.sp)
+            Text("100% Synchronized", color = Color(0xFFD4D4DC), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Telemetry Bus Channel", color = VargTextSecondary, fontSize = 13.sp)
+            Text("CAN Bus Varg Logger", color = VargTextSecondary, fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+private fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(ColorDarkTile, RoundedCornerShape(14.dp))
+            .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
+            .padding(16.dp),
+    ) {
+        Text(
+            text = value,
+            color = VargWhite,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = label,
+            color = VargTextSecondary,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.5.sp,
+        )
+    }
+}
+
+private fun formatFullDuration(durationS: Int): String {
+    val h = durationS / 3600
+    val m = (durationS % 3600) / 60
+    val s = durationS % 60
+    return "%dh %02dm %02ds".format(h, m, s)
+}
+
+private val ColorDarkTile = VargSurfaceCard

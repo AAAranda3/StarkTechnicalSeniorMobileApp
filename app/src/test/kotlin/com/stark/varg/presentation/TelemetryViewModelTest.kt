@@ -133,4 +133,57 @@ class TelemetryViewModelTest {
         val state = viewModel.uiState.value as TelemetryUiState.Success
         assertTrue(state.snapshot.diagnostics.warnings.isEmpty())
     }
+
+    @Test
+    fun `each power profile is individual and modifying one profile modifies only that profile`() = runTest {
+        val snapshot = buildSnapshot()
+        coEvery { getTelemetryUseCase() } returns Result.success(snapshot)
+
+        val viewModel = TelemetryViewModel(getTelemetryUseCase)
+        advanceUntilIdle()
+
+        // 1. Initial active mode is M3 (80 HP, 45% Engine Braking, 60% Regen)
+        assertEquals("M3", viewModel.selectedMode.value)
+        assertEquals(80, viewModel.maxPowerHp.value)
+        assertEquals(45, viewModel.engineBrakingPct.value)
+        assertEquals(60, viewModel.regenPct.value)
+
+        // 2. Switch to M4 and customize it to 56 HP
+        viewModel.selectMode("M4")
+        assertEquals("M4", viewModel.selectedMode.value)
+        viewModel.updateMaxPower(56)
+        viewModel.updateEngineBraking(52)
+        viewModel.updateRegen(68)
+
+        assertEquals(56, viewModel.maxPowerHp.value)
+        assertEquals(52, viewModel.engineBrakingPct.value)
+        assertEquals(68, viewModel.regenPct.value)
+
+        // 3. Switch to M1: must have M1's own independent values
+        viewModel.selectMode("M1")
+        assertEquals("M1", viewModel.selectedMode.value)
+        assertEquals(35, viewModel.maxPowerHp.value)
+        assertEquals(25, viewModel.engineBrakingPct.value)
+        assertEquals(40, viewModel.regenPct.value)
+
+        // 4. Modify M1's max power to 42 HP
+        viewModel.updateMaxPower(42)
+        assertEquals(42, viewModel.maxPowerHp.value)
+
+        // 5. Switch back to M4: M4 MUST still have 56 HP (not affected by M1's edit)
+        viewModel.selectMode("M4")
+        assertEquals(56, viewModel.maxPowerHp.value)
+        assertEquals(52, viewModel.engineBrakingPct.value)
+        assertEquals(68, viewModel.regenPct.value)
+
+        // 6. Switch back to M3: M3 MUST still have 80 HP (not affected by M4 or M1)
+        viewModel.selectMode("M3")
+        assertEquals(80, viewModel.maxPowerHp.value)
+        assertEquals(45, viewModel.engineBrakingPct.value)
+        assertEquals(60, viewModel.regenPct.value)
+
+        // 7. Switch back to M1: M1 MUST still have 42 HP
+        viewModel.selectMode("M1")
+        assertEquals(42, viewModel.maxPowerHp.value)
+    }
 }
