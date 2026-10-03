@@ -22,15 +22,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.BatteryStatus
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
 import com.stark.varg.domain.model.SessionData
+import com.stark.varg.domain.model.UnitSystem
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.domain.util.UnitConverter
+import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -57,6 +65,8 @@ fun PortraitDashboardCard(
     diagnostics: DiagnosticsData,
     selectedMode: String,
     activeMaxPowerHp: Int = settings.maxPowerHp,
+    unitSystem: UnitSystem = UnitSystem.METRIC,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
     onOpenBatteryOptions: () -> Unit = {},
     onOpenStats: () -> Unit = {},
@@ -90,6 +100,10 @@ fun PortraitDashboardCard(
                         ),
                     )
                     .border(1.dp, alertAccent.copy(alpha = 0.55f), RoundedCornerShape(10.dp))
+                    .semantics {
+                        contentDescription = "Active alert: $primaryWarning. Tap to view diagnostics."
+                        role = Role.Button
+                    }
                     .clickable { onOpenDiagnostics() }
                     .padding(horizontal = 16.dp, vertical = 13.dp),
             ) {
@@ -111,7 +125,7 @@ fun PortraitDashboardCard(
                         )
                     }
                     Text(
-                        text = "VIEW →",
+                        text = VargStrings.viewAction(language),
                         color = alertAccent,
                         style = StarkTypographyTokens.TechnicalLabel.copy(color = alertAccent),
                     )
@@ -129,7 +143,7 @@ fun PortraitDashboardCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "SERVICES",
+                text = VargStrings.servicesHeader(language),
                 style = StarkTypographyTokens.TechnicalHeader,
                 letterSpacing = 1.5.sp,
             )
@@ -148,26 +162,30 @@ fun PortraitDashboardCard(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             // Power Modes Card (Bronze Accent)
+            val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
             DashboardServiceCard(
                 iconContent = { VargIconModes(color = VargSecondary, sizeDp = 18.dp) },
-                title = "Power Modes",
-                subtitle = "$selectedMode Profile • $activeMaxPowerHp HP",
+                title = VargStrings.servicePowerModes(language),
+                subtitle = "$selectedMode Profile • $activeMaxPowerHp $hpUnit",
                 onClick = onOpenModes,
             )
 
             // Motor & Inverter Powertrain Card (Bronze Accent)
+            val (motorTempVal, motorTempUnit) = UnitConverter.formatTemperature(motor.temperatureC, unitSystem)
             DashboardServiceCard(
                 iconContent = { VargIconMotor(color = VargSecondary, sizeDp = 18.dp) },
-                title = "Motor & Powertrain",
-                subtitle = "${motor.powerHp} HP • ${motor.temperatureC}°C",
+                title = VargStrings.serviceMotor(language),
+                subtitle = "${motor.powerHp} $hpUnit • $motorTempVal $motorTempUnit",
                 onClick = onOpenMotor,
             )
 
             // Session & Circuit Telemetry Card (Bronze Accent)
+            val (distVal, distUnit) = UnitConverter.formatDistance(session.distanceKm, unitSystem)
+            val (speedVal, speedUnit) = UnitConverter.formatSpeed(session.maxSpeedKmh, unitSystem)
             DashboardServiceCard(
                 iconContent = { VargIconStats(color = VargSecondary, sizeDp = 18.dp) },
-                title = "Trip & Circuit Telemetry",
-                subtitle = "${session.distanceKm} km • Peak ${session.maxSpeedKmh} km/h",
+                title = VargStrings.serviceTelemetry(language),
+                subtitle = "$distVal $distUnit • Peak $speedVal $speedUnit",
                 onClick = onOpenStats,
             )
 
@@ -179,8 +197,12 @@ fun PortraitDashboardCard(
                         sizeDp = 18.dp,
                     )
                 },
-                title = "System Diagnostics",
-                subtitle = if (hasAlert) "${diagnostics.warnings.size} Active Advisory" else "All Systems Operational",
+                title = VargStrings.serviceDiagnostics(language),
+                subtitle = if (hasAlert) {
+                    VargStrings.activeAdvisory(language, diagnostics.warnings.size.coerceAtLeast(1))
+                } else {
+                    if (language == AppLanguage.SPANISH) "Sistemas Operativos" else "All Systems Operational"
+                },
                 onClick = onOpenDiagnostics,
             )
         }
@@ -214,6 +236,10 @@ private fun DashboardServiceCard(
                 ),
             )
             .border(1.dp, Color(0xFF26262C), RoundedCornerShape(14.dp))
+            .semantics {
+                contentDescription = "$title, $subtitle. Tap to configure."
+                role = Role.Button
+            }
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 15.dp),
     ) {

@@ -1,5 +1,12 @@
 package com.stark.varg.presentation.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,47 +15,63 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.BatteryStatus
 import com.stark.varg.domain.model.BikeInfo
+import com.stark.varg.domain.model.ChargingState
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
 import com.stark.varg.domain.model.SessionData
+import com.stark.varg.domain.model.UnitSystem
 import com.stark.varg.domain.model.WarningSeverity
+import com.stark.varg.domain.util.UnitConverter
+import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
-import com.stark.varg.ui.theme.VargBorderSubtle
-import com.stark.varg.ui.theme.VargCyan
 import com.stark.varg.ui.theme.VargElectricGreen
 import com.stark.varg.ui.theme.VargPitchBlack
+import com.stark.varg.ui.theme.VargSecondary
 import com.stark.varg.ui.theme.VargStarkRed
-import com.stark.varg.ui.theme.VargSurfaceCard
-import com.stark.varg.ui.theme.VargSurfaceDark
 import com.stark.varg.ui.theme.VargTextSecondary
 import com.stark.varg.ui.theme.VargWarningAmber
 import com.stark.varg.ui.theme.VargWhite
 
 /**
  * Handlebar Cockpit Grid in Landscape mode.
- * Strictly uses data from JSON with unified monochrome Gris / Blanco icons.
+ * Perfectly balances the motorcycle hero stage, centered range/battery readings,
+ * and full-sized enterprise service cards matching the portrait design system.
  */
 @Composable
 fun LandscapeCockpitGrid(
@@ -60,305 +83,588 @@ fun LandscapeCockpitGrid(
     diagnostics: DiagnosticsData,
     selectedMode: String,
     activeMaxPowerHp: Int = settings.maxPowerHp,
+    unitSystem: UnitSystem = UnitSystem.METRIC,
+    language: AppLanguage = AppLanguage.SPANISH,
+    isLiveStreamActive: Boolean = false,
     modifier: Modifier = Modifier,
+    onToggleUnitSystem: () -> Unit = {},
+    onToggleLiveStream: () -> Unit = {},
     onOpenModes: () -> Unit = {},
     onOpenMotor: () -> Unit = {},
     onOpenStats: () -> Unit = {},
     onOpenDiagnostics: () -> Unit = {},
     onOpenBatteryOptions: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+    onRefresh: () -> Unit = {},
 ) {
-    val durationFormatted = formatDuration(session.durationS)
+    val haptic = LocalHapticFeedback.current
     val hasAlert = diagnostics.warnings.isNotEmpty() || diagnostics.faultCodes.isNotEmpty()
     val hasCritical = diagnostics.warnings.any { it.severity == WarningSeverity.CRITICAL } || diagnostics.faultCodes.isNotEmpty()
     val alertAccent = if (hasCritical) VargStarkRed else VargWarningAmber
+    val primaryWarning = diagnostics.warnings.firstOrNull()?.message ?: "Check diagnostics"
+    val isCharging = battery.chargingState == ChargingState.CHARGING
+
+    val (tripDistVal, tripDistUnit) = UnitConverter.formatDistance(session.distanceKm, unitSystem)
+    val (maxSpeedVal, maxSpeedUnit) = UnitConverter.formatSpeed(session.maxSpeedKmh, unitSystem)
+    val (motorTempVal, motorTempUnit) = UnitConverter.formatTemperature(motor.temperatureC, unitSystem)
+    val (rangeVal, rangeUnit) = UnitConverter.formatRange(battery.estimatedRangeKm, unitSystem)
+    val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
+
+    val liveBorderColor by animateColorAsState(
+        targetValue = if (isLiveStreamActive) VargElectricGreen else Color(0xFF363642),
+        label = "liveBorderCockpit",
+    )
+    val infiniteTransition = rememberInfiniteTransition(label = "pulseTransitionCockpit")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.35f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "pulseAlphaCockpit",
+    )
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(VargPitchBlack)
-            .padding(horizontal = 14.dp, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(horizontal = 20.dp, vertical = 6.dp),
     ) {
-        // Cockpit Top Bar
+        // 1. Top Bar: Pure Stark VARG Brand, CAN Toggle, Units, Bell, Settings
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 4.dp),
+                .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Left: Signature VARG brand + Trip Summary
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "VARG",
-                    color = VargWhite,
-                    style = StarkTypographyTokens.BrandTitle,
-                )
-                Spacer(Modifier.width(16.dp))
-                Text(
-                    text = "$durationFormatted  ${session.distanceKm} km",
-                    color = VargWhite,
-                    style = StarkTypographyTokens.CardSubtitle.copy(color = VargWhite),
-                )
-                Spacer(Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .background(VargElectricGreen, CircleShape),
-                )
-                Spacer(Modifier.width(5.dp))
-                Text(
-                    text = "Connected",
-                    color = VargTextSecondary,
-                    style = StarkTypographyTokens.ScaleTick,
-                )
-                Spacer(Modifier.width(12.dp))
-                Text(
-                    text = bike.model,
-                    color = VargTextSecondary,
-                    style = StarkTypographyTokens.ScaleTick,
-                )
-            }
-
-            // Right: Electric Green Battery Pill
+            // Left: Telemetry Sync + Live 4Hz Stream Toggle (Glove-Friendly Ergonomics)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(VargElectricGreen)
-                        .clickable { onOpenBatteryOptions() }
-                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF222228))
+                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onRefresh()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    VargIconSync(color = VargSecondary, sizeDp = 24.dp)
+                }
+
+                Box(
+                    modifier = Modifier
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (isLiveStreamActive) Color(0x2200E676) else Color(0xFF222228))
+                        .border(1.dp, liveBorderColor, RoundedCornerShape(10.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onToggleLiveStream()
+                        }
+                        .padding(horizontal = 12.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .graphicsLayer { alpha = if (isLiveStreamActive) pulseAlpha else 0.4f }
+                                .background(if (isLiveStreamActive) VargElectricGreen else VargSecondary, CircleShape),
+                        )
+                        Spacer(Modifier.width(7.dp))
                         Text(
-                            text = "⚡ ${battery.stateOfChargePct}%",
-                            color = VargPitchBlack,
-                            style = StarkTypographyTokens.ScaleTick.copy(
-                                color = VargPitchBlack,
+                            text = if (isLiveStreamActive) VargStrings.streamLiveBadge(language) else VargStrings.streamOffBadge(language),
+                            color = if (isLiveStreamActive) VargElectricGreen else VargSecondary,
+                            style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                        )
+                    }
+                }
+            }
+
+            // Center: Vehicle Model & Status Subtitle (Exact same layout as portrait)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "STARK VARG",
+                    color = VargWhite,
+                    style = StarkTypographyTokens.BrandTitle.copy(fontSize = 16.sp, letterSpacing = 2.sp),
+                )
+                Spacer(Modifier.height(2.dp))
+                if (isCharging) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .background(VargElectricGreen, CircleShape),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = VargStrings.chargingHeroSubtitle(language),
+                            color = VargElectricGreen,
+                            style = StarkTypographyTokens.CardSubtitle.copy(
+                                color = VargElectricGreen,
                                 fontWeight = FontWeight.SemiBold,
+                                fontSize = 12.sp,
+                            ),
+                        )
+                    }
+                } else {
+                    Text(
+                        text = VargStrings.readyToRide(language),
+                        color = VargTextSecondary,
+                        style = StarkTypographyTokens.CardSubtitle.copy(fontSize = 12.sp),
+                    )
+                }
+            }
+
+            // Right: Unit System Pill + Bell (Alerts) + Settings Gear (Glove-Friendly Ergonomics)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF222228))
+                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onToggleUnitSystem()
+                        }
+                        .padding(horizontal = 14.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = if (unitSystem == UnitSystem.METRIC) "KM / °C" else "MI / °F",
+                        color = VargWhite,
+                        style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp),
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF222228))
+                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpenDiagnostics()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    VargIconBell(color = VargSecondary, sizeDp = 24.dp)
+                    if (hasAlert) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 5.dp, end = 5.dp)
+                                .size(9.dp)
+                                .background(VargStarkRed, CircleShape),
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF222228))
+                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpenSettings()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = VargWhite,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            }
+        }
+
+        // 2. Cockpit Body: Open Showroom Stage on Left, Large Services on Right
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            // LEFT COLUMN: Centered Battery & Range Gauge + Motorcycle Showroom Stage + Alert Banner
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                // 1. Centered Range & Battery SoC Gauge (Identical to portrait)
+                Column(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpenBatteryOptions()
+                        }
+                        .padding(horizontal = 16.dp, vertical = 2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = rangeVal,
+                            color = VargWhite,
+                            fontSize = 38.sp,
+                            fontWeight = FontWeight.ExtraLight,
+                            letterSpacing = (-0.5).sp,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = rangeUnit.uppercase(),
+                            color = VargWhite,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Normal,
+                            letterSpacing = 1.sp,
+                            modifier = Modifier.padding(bottom = 3.dp),
+                        )
+
+                        Spacer(Modifier.width(16.dp))
+                        Text(
+                            text = "|",
+                            color = Color(0xFF383838),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraLight,
+                        )
+                        Spacer(Modifier.width(16.dp))
+
+                        VargIconBatteryVertical(
+                            percentage = battery.stateOfChargePct,
+                            color = VargSecondary,
+                            sizeDp = 18.dp,
+                        )
+                        Spacer(Modifier.width(8.dp))
+
+                        Text(
+                            text = "${battery.stateOfChargePct}",
+                            color = VargWhite,
+                            fontSize = 38.sp,
+                            fontWeight = FontWeight.ExtraLight,
+                            letterSpacing = (-0.5).sp,
+                        )
+                        Spacer(Modifier.width(3.dp))
+                        Text(
+                            text = "%",
+                            color = VargWhite,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Normal,
+                            letterSpacing = 1.sp,
+                            modifier = Modifier.padding(bottom = 3.dp),
+                        )
+                    }
+
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = VargStrings.estimatedRangeLabel(language, if (unitSystem == UnitSystem.METRIC) "km" else "mi"),
+                        color = VargTextSecondary,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 1.sp,
+                    )
+                }
+
+                // 2. Centered Motorcycle Showroom Stage (No box enclosure, pure pitch black canvas)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(vertical = 4.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    // Red/Green Ambient Glow
+                    Box(
+                        modifier = Modifier
+                            .size(260.dp, 120.dp)
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        if (isCharging) VargElectricGreen.copy(alpha = 0.25f) else VargStarkRed.copy(alpha = 0.2f),
+                                        Color.Transparent,
+                                    ),
+                                ),
+                            ),
+                    )
+
+                    // Ground shadow
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 6.dp)
+                            .size(width = 240.dp, height = 16.dp)
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        Color.Black.copy(alpha = 0.95f),
+                                        Color.Transparent,
+                                    ),
+                                ),
+                            ),
+                    )
+
+                    // Showroom floor highlight line
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 8.dp)
+                            .size(width = 210.dp, height = 1.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        VargSecondary.copy(alpha = 0.4f),
+                                        Color.Transparent,
+                                    ),
+                                ),
+                            ),
+                    )
+
+                    // Motorcycle Cutout Image
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(bike.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = bike.model,
+                        modifier = Modifier
+                            .fillMaxWidth(0.92f)
+                            .fillMaxHeight(),
+                        contentScale = ContentScale.Fit,
+                    )
+                }
+
+                // 3. Active Warning Banner (Identical to portrait style)
+                if (hasAlert) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color(0xFF2C2825),
+                                        Color(0xFF262320),
+                                    ),
+                                ),
+                            )
+                            .border(1.dp, alertAccent.copy(alpha = 0.55f), RoundedCornerShape(10.dp))
+                            .clickable { onOpenDiagnostics() }
+                            .padding(horizontal = 14.dp, vertical = 11.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                VargIconDiagnostics(color = alertAccent, sizeDp = 16.dp)
+                                Spacer(Modifier.width(10.dp))
+                                Text(
+                                    text = primaryWarning,
+                                    color = VargWhite,
+                                    style = StarkTypographyTokens.CardSubtitle.copy(color = VargWhite),
+                                    maxLines = 1,
+                                )
+                            }
+                            Text(
+                                text = VargStrings.viewAction(language),
+                                color = alertAccent,
+                                style = StarkTypographyTokens.TechnicalLabel.copy(color = alertAccent),
+                            )
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "✓ ${VargStrings.allSystemsOperational(language)}",
+                            color = VargElectricGreen,
+                            style = StarkTypographyTokens.TechnicalLabel.copy(
+                                color = VargElectricGreen,
+                                fontSize = 11.sp,
                             ),
                         )
                     }
                 }
             }
-        }
 
-        // Primary Cockpit Tiles Grid
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            CockpitTile(
-                modifier = Modifier.weight(1f),
-                iconContent = { VargIconModes(color = VargWhite, sizeDp = 16.dp) },
-                title = "Modes",
-                subtitle = "$selectedMode • $activeMaxPowerHp HP",
-                onClick = onOpenModes,
-            )
-
-            CockpitTile(
-                modifier = Modifier.weight(1f),
-                iconContent = { VargIconMotor(color = VargWhite, sizeDp = 16.dp) },
-                title = "Motor",
-                subtitle = "${motor.powerHp} HP • ${motor.temperatureC}°C",
-                onClick = onOpenMotor,
-            )
-
-            CockpitTile(
-                modifier = Modifier.weight(1f),
-                iconContent = { VargIconStats(color = VargWhite, sizeDp = 16.dp) },
-                title = "Stats",
-                subtitle = "${session.distanceKm} km • Max ${session.maxSpeedKmh}",
-                onClick = onOpenStats,
-            )
-
-            CockpitTile(
-                modifier = Modifier.weight(1f),
-                iconContent = {
-                    VargIconDiagnostics(
-                        color = if (hasAlert) alertAccent else VargWhite,
-                        sizeDp = 16.dp,
-                    )
-                },
-                title = "Diagnostics",
-                subtitle = if (hasAlert) "${diagnostics.warnings.size} Advisory" else "Nominal",
-                badge = if (hasAlert) "ALERT" else null,
-                badgeColor = if (hasAlert) alertAccent else null,
-                onClick = onOpenDiagnostics,
-            )
-        }
-
-        // Wider Grid Cards (Trip History & Autonomy Status)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            // Session Telemetry Card
-            Box(
+            // RIGHT COLUMN: Large, Spacious Enterprise Service Cards (Matching portrait DashboardServiceCard)
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ColorDarkTile)
-                    .border(1.dp, VargBorderSubtle, RoundedCornerShape(12.dp))
-                    .clickable { onOpenStats() }
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                    .weight(1.05f)
+                    .fillMaxHeight()
+                    .padding(start = 4.dp),
             ) {
+                // Section Header with < > (Pinned at top)
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 2.dp, end = 2.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            VargIconStats(color = VargTextSecondary, sizeDp = 14.dp)
-                            Spacer(Modifier.width(6.dp))
-                            Text(
-                                 text = "TRIP TELEMETRY",
-                                 color = VargTextSecondary,
-                                 style = StarkTypographyTokens.TechnicalLabel,
+                    Text(
+                        text = VargStrings.servicesHeader(language),
+                        style = StarkTypographyTokens.TechnicalHeader,
+                        letterSpacing = 1.5.sp,
+                    )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("<", style = StarkTypographyTokens.TechnicalLabel.copy(color = VargSecondary.copy(alpha = 0.6f)))
+                        Text(">", style = StarkTypographyTokens.TechnicalLabel.copy(color = VargSecondary.copy(alpha = 0.6f)))
+                    }
+                }
+
+                // Scrollable Cards List
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    // 1. Modos de Potencia
+                    LandscapeServiceCard(
+                        iconContent = { VargIconModes(color = VargSecondary, sizeDp = 18.dp) },
+                        title = VargStrings.servicePowerModes(language),
+                        subtitle = "$selectedMode Profile • $activeMaxPowerHp $hpUnit",
+                        onClick = onOpenModes,
+                    )
+
+                    // 2. Motor y Transmisión
+                    LandscapeServiceCard(
+                        iconContent = { VargIconMotor(color = VargSecondary, sizeDp = 18.dp) },
+                        title = VargStrings.serviceMotor(language),
+                        subtitle = "${motor.powerHp} $hpUnit • $motorTempVal $motorTempUnit",
+                        onClick = onOpenMotor,
+                    )
+
+                    // 3. Telemetría de Viaje
+                    LandscapeServiceCard(
+                        iconContent = { VargIconStats(color = VargSecondary, sizeDp = 18.dp) },
+                        title = VargStrings.serviceTelemetry(language),
+                        subtitle = "$tripDistVal $tripDistUnit • Peak $maxSpeedVal $maxSpeedUnit",
+                        onClick = onOpenStats,
+                    )
+
+                    // 4. Diagnóstico del Sistema
+                    LandscapeServiceCard(
+                        iconContent = {
+                            VargIconDiagnostics(
+                                color = if (hasAlert) alertAccent else VargSecondary,
+                                sizeDp = 18.dp,
                             )
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "${session.distanceKm} km  •  $durationFormatted",
-                            color = VargWhite,
-                            style = StarkTypographyTokens.ValueMedium,
-                        )
-                    }
-                    Text(
-                        text = "MAX ${session.maxSpeedKmh} KM/H",
-                        color = VargElectricGreen,
-                        style = StarkTypographyTokens.TechnicalLabel.copy(color = VargElectricGreen),
+                        },
+                        title = VargStrings.serviceDiagnostics(language),
+                        subtitle = if (hasAlert) {
+                            VargStrings.activeAdvisory(language, diagnostics.warnings.size.coerceAtLeast(1))
+                        } else {
+                            VargStrings.allSystemsOperational(language)
+                        },
+                        onClick = onOpenDiagnostics,
                     )
-                }
-            }
 
-            // Autonomy & Battery Pack Status Card
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ColorDarkTile)
-                    .border(1.dp, VargBorderSubtle, RoundedCornerShape(12.dp))
-                    .clickable { onOpenBatteryOptions() }
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column {
-                        Text(
-                            text = "AUTONOMY & BATTERY",
-                            color = VargTextSecondary,
-                            style = StarkTypographyTokens.TechnicalLabel,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "${battery.estimatedRangeKm} km  •  ${battery.stateOfChargePct}%",
-                            color = VargWhite,
-                            style = StarkTypographyTokens.ValueMedium,
-                        )
-                    }
-                    Text(
-                        text = "${battery.temperatureC}°C",
-                        color = VargCyan,
-                        style = StarkTypographyTokens.TechnicalLabel.copy(color = VargCyan),
-                    )
+                    Spacer(Modifier.height(8.dp))
                 }
-            }
-        }
-
-        // Active Advisory Bar in Cockpit (if any)
-        if (hasAlert) {
-            val alertMessage = diagnostics.warnings.firstOrNull()?.message ?: "System Advisory Active"
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(alertAccent.copy(alpha = 0.15f))
-                    .border(1.dp, alertAccent.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                    .clickable { onOpenDiagnostics() }
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    VargIconDiagnostics(color = alertAccent, sizeDp = 13.dp)
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = alertMessage,
-                        color = VargWhite,
-                        style = StarkTypographyTokens.CardSubtitle.copy(color = VargWhite),
-                    )
-                }
-                Text(
-                    text = "DETAILS ➔",
-                    color = alertAccent,
-                    style = StarkTypographyTokens.TechnicalLabel.copy(color = alertAccent),
-                )
             }
         }
     }
 }
 
+/**
+ * Full-size spacious service card for Landscape mode,
+ * matching portrait DashboardServiceCard's height, typography, icon box, and aesthetics.
+ */
 @Composable
-private fun CockpitTile(
-    iconContent: @Composable () -> Unit,
+private fun LandscapeServiceCard(
     title: String,
     subtitle: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    badge: String? = null,
-    badgeColor: Color? = null,
-    onClick: () -> Unit = {},
+    iconContent: @Composable () -> Unit,
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(ColorDarkTile)
-            .border(1.dp, VargBorderSubtle, RoundedCornerShape(12.dp))
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color(0xFF161619),
+                        Color(0xFF111113),
+                    ),
+                ),
+            )
+            .border(1.dp, Color(0xFF26262C), RoundedCornerShape(14.dp))
             .clickable { onClick() }
-            .padding(10.dp),
+            .padding(horizontal = 16.dp, vertical = 11.dp),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(Color(0xFF1C1C22), CircleShape),
-                contentAlignment = Alignment.Center,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
             ) {
-                iconContent()
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF1C1C22))
+                        .border(1.dp, VargSecondary.copy(alpha = 0.25f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    iconContent()
+                }
+
+                Spacer(Modifier.width(14.dp))
+
+                Column {
+                    Text(
+                        text = title,
+                        style = StarkTypographyTokens.CardTitle,
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = subtitle,
+                        style = StarkTypographyTokens.CardSubtitle,
+                    )
+                }
             }
 
-            Spacer(Modifier.height(6.dp))
-
-            Text(
-                text = title,
-                color = VargWhite,
-                style = StarkTypographyTokens.CardTitle,
-            )
-
-            Spacer(Modifier.height(2.dp))
-
-            Text(
-                text = subtitle,
-                color = VargTextSecondary,
-                style = StarkTypographyTokens.ScaleTick,
-                maxLines = 1,
-            )
+            VargIconChevronRight(color = VargSecondary.copy(alpha = 0.75f), sizeDp = 14.dp)
         }
     }
 }
-
-private fun formatDuration(durationS: Int): String {
-    val h = durationS / 3600
-    val m = (durationS % 3600) / 60
-    return "${h}h ${m}m"
-}
-
-private val ColorDarkTile = VargSurfaceCard

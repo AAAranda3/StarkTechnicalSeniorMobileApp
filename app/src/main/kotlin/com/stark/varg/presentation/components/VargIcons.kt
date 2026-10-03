@@ -536,3 +536,84 @@ fun VargIconBatteryVertical(
     }
 }
 
+@Composable
+fun VargIconSync(
+    modifier: Modifier = Modifier,
+    color: Color = VargSecondary,
+    sizeDp: Dp = 18.dp,
+) {
+    Canvas(modifier = modifier.size(sizeDp)) {
+        val w = size.width
+        val h = size.height
+        val stroke = 1.8.dp.toPx()
+
+        // Top arc (clockwise: from 200° to 380°, sweep 140°)
+        drawArc(
+            color = color,
+            startAngle = 200f,
+            sweepAngle = 140f,
+            useCenter = false,
+            topLeft = Offset(w * 0.14f, h * 0.14f),
+            size = Size(w * 0.72f, h * 0.72f),
+            style = Stroke(stroke, cap = StrokeCap.Round),
+        )
+        // Top arrow head at ~340° (top right)
+        val arrow1 = Path().apply {
+            moveTo(w * 0.82f, h * 0.14f)
+            lineTo(w * 0.88f, h * 0.34f)
+            lineTo(w * 0.68f, h * 0.30f)
+        }
+        drawPath(arrow1, color, style = Stroke(stroke, cap = StrokeCap.Round, join = StrokeJoin.Round))
+
+        // Bottom arc (clockwise: from 20° to 200°, sweep 140°)
+        drawArc(
+            color = color,
+            startAngle = 20f,
+            sweepAngle = 140f,
+            useCenter = false,
+            topLeft = Offset(w * 0.14f, h * 0.14f),
+            size = Size(w * 0.72f, h * 0.72f),
+            style = Stroke(stroke, cap = StrokeCap.Round),
+        )
+        // Bottom arrow head at ~160° (bottom left)
+        val arrow2 = Path().apply {
+            moveTo(w * 0.18f, h * 0.86f)
+            lineTo(w * 0.12f, h * 0.66f)
+            lineTo(w * 0.32f, h * 0.70f)
+        }
+        drawPath(arrow2, color, style = Stroke(stroke, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    }
+}
+
+@Composable
+fun VargIconPlug(
+    modifier: Modifier = Modifier,
+    color: Color = VargSecondary,
+    sizeDp: Dp = 18.dp,
+) {
+    Canvas(modifier = modifier.size(sizeDp)) {
+        val w = size.width
+        val h = size.height
+        val stroke = 1.8.dp.toPx()
+
+        // Two prongs at the top
+        drawLine(color, Offset(w * 0.36f, h * 0.12f), Offset(w * 0.36f, h * 0.32f), stroke, StrokeCap.Round)
+        drawLine(color, Offset(w * 0.64f, h * 0.12f), Offset(w * 0.64f, h * 0.32f), stroke, StrokeCap.Round)
+
+        // Plug body
+        val plugBody = Path().apply {
+            moveTo(w * 0.22f, h * 0.32f)
+            lineTo(w * 0.78f, h * 0.32f)
+            lineTo(w * 0.78f, h * 0.62f)
+            cubicTo(w * 0.78f, h * 0.76f, w * 0.62f, h * 0.76f, w * 0.58f, h * 0.76f)
+            lineTo(w * 0.42f, h * 0.76f)
+            cubicTo(w * 0.38f, h * 0.76f, w * 0.22f, h * 0.76f, w * 0.22f, h * 0.62f)
+            close()
+        }
+        drawPath(plugBody, color, style = Stroke(stroke, cap = StrokeCap.Round, join = StrokeJoin.Round))
+
+        // Cable wire coming out of the bottom
+        drawLine(color, Offset(w * 0.50f, h * 0.76f), Offset(w * 0.50f, h * 0.94f), stroke, StrokeCap.Round)
+    }
+}
+

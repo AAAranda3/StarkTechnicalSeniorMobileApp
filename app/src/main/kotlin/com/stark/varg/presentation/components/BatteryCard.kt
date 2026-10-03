@@ -1,5 +1,11 @@
 package com.stark.varg.presentation.components
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,15 +56,18 @@ fun BatteryCard(
     battery: BatteryStatus,
     modifier: Modifier = Modifier,
     onOpenOptions: () -> Unit = {},
+    onToggleCharging: () -> Unit = {},
 ) {
+    val isCharging = battery.chargingState == ChargingState.CHARGING
     val batteryColor = when {
+        isCharging -> VargElectricGreen
         battery.stateOfChargePct <= 20 -> VargStarkRed
         battery.stateOfChargePct <= 45 -> VargWarningAmber
         else -> VargElectricGreen
     }
 
     val chargingLabel = when (battery.chargingState) {
-        ChargingState.CHARGING -> "CHARGING"
+        ChargingState.CHARGING -> "⚡ CHARGING • 3.3 kW"
         ChargingState.DISCHARGING -> "DISCHARGING"
         ChargingState.UNKNOWN -> "STANDBY"
     }
@@ -85,9 +96,10 @@ fun BatteryCard(
                 )
                 StarkPill(
                     text = chargingLabel,
-                    backgroundColor = VargPillDark,
-                    borderColor = VargBorderSubtle,
-                    textColor = if (battery.chargingState == ChargingState.CHARGING) VargElectricGreen else VargTextSecondary,
+                    backgroundColor = if (isCharging) VargElectricGreen.copy(alpha = 0.18f) else VargPillDark,
+                    borderColor = if (isCharging) VargElectricGreen.copy(alpha = 0.8f) else VargBorderSubtle,
+                    textColor = if (isCharging) VargElectricGreen else VargTextSecondary,
+                    modifier = Modifier.clickable { onToggleCharging() },
                 )
             }
 
@@ -146,16 +158,51 @@ fun BatteryCard(
 
             Spacer(Modifier.height(14.dp))
 
-            // Gauge Bar
-            LinearProgressIndicator(
-                progress = { (battery.stateOfChargePct / 100f).coerceIn(0f, 1f) },
-                color = batteryColor,
-                trackColor = VargBorderSubtle,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-            )
+            // Gauge Bar: Animated Charging Pulse Beam or Standard Meter
+            if (isCharging) {
+                val infiniteTransition = rememberInfiniteTransition(label = "BatteryCardChargingPulse")
+                val pulseAlpha by infiniteTransition.animateFloat(
+                    initialValue = 0.55f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 750, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse,
+                    ),
+                    label = "ChargingPulseAlpha",
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(VargBorderSubtle),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = (battery.stateOfChargePct / 100f).coerceIn(0f, 1f))
+                            .height(8.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color(0xFF0F5A28),
+                                        VargElectricGreen.copy(alpha = pulseAlpha),
+                                        Color(0xFF88FFB0),
+                                    ),
+                                ),
+                            ),
+                    )
+                }
+            } else {
+                LinearProgressIndicator(
+                    progress = { (battery.stateOfChargePct / 100f).coerceIn(0f, 1f) },
+                    color = batteryColor,
+                    trackColor = VargBorderSubtle,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
+            }
 
             Spacer(Modifier.height(14.dp))
 
