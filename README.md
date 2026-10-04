@@ -141,8 +141,9 @@ Comprehensive test suite covering positive, negative, and corner cases:
 * **`UnitConverterTest`**: Comprehensive tests verifying exact rounding, unit conversion formulas (km $\leftrightarrow$ mi, km/h $\leftrightarrow$ mph, °C $\leftrightarrow$ °F), and edge cases.
 * **`TelemetryViewModelTest`**: Validates initial `Loading` state, transition to `Success`, error recovery with retry, independent M1–M5 power mode customization, DataStore persistence reactivity, metric/imperial unit toggle, live 4 Hz CAN-bus stream collection, and simulated charging state transitions.
 
-### UI Instrumented Test (`app/src/androidTest/`)
+### UI Instrumented Tests (`app/src/androidTest/`)
 * **`TelemetryScreenTest`**: Android Compose instrumented test verifying the display of bike model info, battery percentage, and active advisory banner.
+* **`FullNavigationAndConfigurationTest`**: Complete end-to-end journey traversing all screens (Dashboard, Modes, Motor & Powertrain, Stats, Diagnostics, Battery, and Settings), changing configurations (M1–M5 mode selection, battery charging target limit, charging toggle, instant English/Spanish localization, Metric/Imperial toggle, and CAN Live Stream broadcast), and asserting immediate visual reflection across screens.
 
 ---
 
