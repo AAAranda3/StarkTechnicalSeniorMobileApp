@@ -132,15 +132,14 @@ fun LandscapeCockpitGrid(
             .padding(horizontal = 20.dp, vertical = 6.dp),
     ) {
         // 1. Top Bar: Pure Stark VARG Brand, CAN Toggle, Units, Bell, Settings
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Left: Telemetry Sync + Live CAN Stream Toggle (Clean Integrated Header Icons)
             Row(
+                modifier = Modifier.align(Alignment.CenterStart),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
@@ -203,8 +202,11 @@ fun LandscapeCockpitGrid(
                 }
             }
 
-            // Center: Vehicle Model & Status Subtitle (Exact same layout as portrait)
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Center: Vehicle Model & Status Subtitle (Strict Mathematical Center)
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
                     text = "STARK VARG",
                     color = VargWhite,
@@ -240,6 +242,7 @@ fun LandscapeCockpitGrid(
 
             // Right: Integrated Unit Pill + Settings Gear
             Row(
+                modifier = Modifier.align(Alignment.CenterEnd),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {

@@ -105,15 +105,14 @@ fun BikeShowcase(
             .padding(vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 18.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Left: Telemetry Sync + Live CAN Stream Toggle (Clean Integrated Header Icons)
             Row(
+                modifier = Modifier.align(Alignment.CenterStart),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
@@ -188,8 +187,11 @@ fun BikeShowcase(
                 }
             }
 
-            // Center: Vehicle Model & Status Subtitle (Unobstructed Breathing Room)
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Center: Vehicle Model & Status Subtitle (Strict Mathematical Center)
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
                     text = "STARK VARG",
                     color = VargWhite,
@@ -226,6 +228,7 @@ fun BikeShowcase(
             // Right: Integrated Unit Switcher Pill
             Box(
                 modifier = Modifier
+                    .align(Alignment.CenterEnd)
                     .height(28.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(Color(0x16FFFFFF))
@@ -405,35 +408,21 @@ fun BikeShowcase(
 
         Spacer(Modifier.height(10.dp))
 
-        // Stark Marketing Tagline & User Welcome
-        Column(
+        // Stark Marketing Motto
+        Text(
+            text = "RIDE ANYWHERE, ANYTIME",
+            color = VargWhite.copy(alpha = 0.85f),
+            textAlign = TextAlign.Center,
+            style = StarkTypographyTokens.TechnicalHeader.copy(
+                fontSize = 11.sp,
+                letterSpacing = 2.sp,
+                fontWeight = FontWeight.Medium,
+                color = VargWhite.copy(alpha = 0.85f),
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "RIDE ANYWHERE,\nANYTIME",
-                color = VargWhite,
-                textAlign = TextAlign.Center,
-                style = StarkTypographyTokens.BrandTitle.copy(
-                    fontSize = 17.sp,
-                    lineHeight = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.5.sp,
-                ),
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = VargStrings.riderWelcome(language),
-                color = VargTextSecondary,
-                textAlign = TextAlign.Center,
-                style = StarkTypographyTokens.CardSubtitle.copy(
-                    fontSize = 12.sp,
-                    letterSpacing = 0.5.sp,
-                ),
-            )
-        }
-        Spacer(Modifier.height(6.dp))
+        )
+        Spacer(Modifier.height(8.dp))
     }
 }
