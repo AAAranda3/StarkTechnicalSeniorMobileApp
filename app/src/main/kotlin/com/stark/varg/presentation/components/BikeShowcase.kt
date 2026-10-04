@@ -410,7 +410,7 @@ fun BikeShowcase(
 
         // Stark Marketing Motto
         Text(
-            text = "RIDE ANYWHERE, ANYTIME",
+            text = VargStrings.marketingMotto(language),
             color = VargWhite.copy(alpha = 0.85f),
             textAlign = TextAlign.Center,
             style = StarkTypographyTokens.TechnicalHeader.copy(

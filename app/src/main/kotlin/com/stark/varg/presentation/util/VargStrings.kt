@@ -35,6 +35,11 @@ object VargStrings {
         AppLanguage.ENGLISH -> "Ready to ride!"
     }
 
+    fun marketingMotto(lang: AppLanguage): String = when (lang) {
+        AppLanguage.SPANISH -> "RUEDA DONDE SEA, CUANDO SEA"
+        AppLanguage.ENGLISH -> "RIDE ANYWHERE, ANYTIME"
+    }
+
     fun riderWelcome(lang: AppLanguage): String = when (lang) {
         AppLanguage.SPANISH -> "Bienvenido a tu Stark VARG"
         AppLanguage.ENGLISH -> "Welcome to your Stark VARG"
