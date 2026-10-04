@@ -81,3 +81,18 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
 }
+
+// Automatically resolve duplicate wireless adb tunnels (mDNS) before running connected tests
+tasks.matching { it.name.startsWith("connected") && it.name.endsWith("AndroidTest") }.configureEach {
+    doFirst {
+        runCatching {
+            val adb = androidComponents.sdkComponents.adb.get().asFile.absolutePath
+            val proc = ProcessBuilder(adb, "devices").start()
+            val text = proc.inputStream.bufferedReader().readText()
+            proc.waitFor()
+            if (text.contains("._adb-tls-connect._tcp")) {
+                ProcessBuilder(adb, "disconnect").start().waitFor()
+            }
+        }
+    }
+}
