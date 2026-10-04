@@ -238,10 +238,10 @@ fun LandscapeCockpitGrid(
                 }
             }
 
-            // Right: Integrated Unit Pill + Bell + Settings Gear
+            // Right: Integrated Unit Pill + Settings Gear
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 // Sleek Compact Unit Switcher Pill
                 Box(
@@ -262,29 +262,6 @@ fun LandscapeCockpitGrid(
                         color = VargWhite,
                         style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
                     )
-                }
-
-                // Diagnostics Bell (Clean Integrated Icon)
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onOpenDiagnostics()
-                        },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    VargIconBell(color = VargWhite.copy(alpha = 0.85f), sizeDp = 20.dp)
-                    if (hasAlert) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 5.dp, end = 5.dp)
-                                .size(7.dp)
-                                .background(VargStarkRed, CircleShape),
-                        )
-                    }
                 }
 
                 // Settings Gear (Clean Integrated Icon)
@@ -600,10 +577,11 @@ fun LandscapeCockpitGrid(
                         },
                         title = VargStrings.serviceDiagnostics(language),
                         subtitle = if (hasAlert) {
-                            VargStrings.activeAdvisory(language, diagnostics.warnings.size.coerceAtLeast(1))
+                            primaryWarning
                         } else {
                             VargStrings.allSystemsOperational(language)
                         },
+                        borderColor = if (hasAlert) alertAccent.copy(alpha = 0.55f) else Color(0xFF26262C),
                         onClick = onOpenDiagnostics,
                     )
 
@@ -624,6 +602,7 @@ private fun LandscapeServiceCard(
     subtitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    borderColor: Color = Color(0xFF26262C),
     iconContent: @Composable () -> Unit,
 ) {
     Box(
@@ -638,7 +617,7 @@ private fun LandscapeServiceCard(
                     ),
                 ),
             )
-            .border(1.dp, Color(0xFF26262C), RoundedCornerShape(14.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(14.dp))
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 11.dp),
     ) {

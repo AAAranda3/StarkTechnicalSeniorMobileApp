@@ -222,62 +222,29 @@ fun BikeShowcase(
                 }
             }
 
-            // Right: Integrated Unit Switcher Pill & Notification Bell
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                // Sleek Compact Unit Switcher Pill
-                Box(
-                    modifier = Modifier
-                        .height(28.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Color(0x16FFFFFF))
-                        .border(1.dp, Color(0x24FFFFFF), RoundedCornerShape(14.dp))
-                        .semantics {
-                            contentDescription = "Toggle unit system. Current: ${if (unitSystem == UnitSystem.METRIC) "Metric" else "Imperial"}"
-                            role = Role.Button
-                        }
-                        .clickable {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onToggleUnitSystem()
-                        }
-                        .padding(horizontal = 9.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = if (unitSystem == UnitSystem.METRIC) "KM" else "MI",
-                        color = VargWhite,
-                        style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
-                    )
-                }
-
-                // Diagnostics Bell (Clean Integrated Icon)
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .semantics {
-                            contentDescription = if (hasAlert) "Diagnostics alerts active. Tap to view." else "Diagnostics nominal. Tap to view."
-                            role = Role.Button
-                        }
-                        .clickable {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onOpenDiagnostics()
-                        },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    VargIconBell(color = VargWhite.copy(alpha = 0.85f), sizeDp = 20.dp)
-                    if (hasAlert) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 5.dp, end = 5.dp)
-                                .size(7.dp)
-                                .background(VargStarkRed, CircleShape),
-                        )
+            // Right: Integrated Unit Switcher Pill
+            Box(
+                modifier = Modifier
+                    .height(28.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color(0x16FFFFFF))
+                    .border(1.dp, Color(0x24FFFFFF), RoundedCornerShape(14.dp))
+                    .semantics {
+                        contentDescription = "Toggle unit system. Current: ${if (unitSystem == UnitSystem.METRIC) "Metric" else "Imperial"}"
+                        role = Role.Button
                     }
-                }
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onToggleUnitSystem()
+                    }
+                    .padding(horizontal = 10.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = if (unitSystem == UnitSystem.METRIC) "KM" else "MI",
+                    color = VargWhite,
+                    style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
+                )
             }
         }
 

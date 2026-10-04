@@ -85,55 +85,6 @@ fun PortraitDashboardCard(
             .background(VargPitchBlack)
             .padding(horizontal = 18.dp, vertical = 6.dp),
     ) {
-        // Active Alert Warning Banner (Orange / Red based on criticality)
-        if (hasAlert) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color(0xFF2C2825),
-                                Color(0xFF262320),
-                            ),
-                        ),
-                    )
-                    .border(1.dp, alertAccent.copy(alpha = 0.55f), RoundedCornerShape(10.dp))
-                    .semantics {
-                        contentDescription = "Active alert: $primaryWarning. Tap to view diagnostics."
-                        role = Role.Button
-                    }
-                    .clickable { onOpenDiagnostics() }
-                    .padding(horizontal = 16.dp, vertical = 13.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        VargIconDiagnostics(color = alertAccent, sizeDp = 16.dp)
-                        Spacer(Modifier.width(10.dp))
-                        Text(
-                            text = primaryWarning,
-                            color = VargWhite,
-                            style = StarkTypographyTokens.CardSubtitle.copy(color = VargWhite),
-                        )
-                    }
-                    Text(
-                        text = VargStrings.viewAction(language),
-                        color = alertAccent,
-                        style = StarkTypographyTokens.TechnicalLabel.copy(color = alertAccent),
-                    )
-                }
-            }
-            Spacer(Modifier.height(18.dp))
-        }
-
         // Systems Section Header
         Row(
             modifier = Modifier
@@ -183,7 +134,7 @@ fun PortraitDashboardCard(
                 onClick = onOpenStats,
             )
 
-            // System Diagnostics Card (Orange / Red alert indicator according to severity)
+            // System Diagnostics Card (Highlighted with active advisory when alert present)
             DashboardServiceCard(
                 iconContent = {
                     VargIconDiagnostics(
@@ -193,10 +144,11 @@ fun PortraitDashboardCard(
                 },
                 title = VargStrings.serviceDiagnostics(language),
                 subtitle = if (hasAlert) {
-                    VargStrings.activeAdvisory(language, diagnostics.warnings.size.coerceAtLeast(1))
+                    primaryWarning
                 } else {
                     if (language == AppLanguage.SPANISH) "Sistemas Operativos" else "All Systems Operational"
                 },
+                borderColor = if (hasAlert) alertAccent.copy(alpha = 0.55f) else Color(0xFF26262C),
                 onClick = onOpenDiagnostics,
             )
         }
@@ -215,6 +167,7 @@ private fun DashboardServiceCard(
     subtitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    borderColor: Color = Color(0xFF26262C),
     iconContent: @Composable () -> Unit,
 ) {
     Box(
@@ -229,7 +182,7 @@ private fun DashboardServiceCard(
                     ),
                 ),
             )
-            .border(1.dp, Color(0xFF26262C), RoundedCornerShape(14.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(14.dp))
             .semantics {
                 contentDescription = "$title, $subtitle. Tap to configure."
                 role = Role.Button
