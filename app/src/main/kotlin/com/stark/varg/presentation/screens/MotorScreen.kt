@@ -42,12 +42,15 @@ import com.stark.varg.ui.theme.VargSecondary
 import com.stark.varg.ui.theme.VargSurfaceCard
 import com.stark.varg.ui.theme.VargTextSecondary
 import com.stark.varg.ui.theme.VargWarningAmber
+import kotlin.math.roundToInt
 import com.stark.varg.ui.theme.VargWhite
 
 @Composable
 fun MotorScreen(
     motor: MotorStatus,
     settings: RideSettings,
+    selectedMode: String = "M2",
+    activeMaxPowerHp: Int = settings.maxPowerHp,
     timestamp: String,
     onBack: () -> Unit,
     unitSystem: UnitSystem = UnitSystem.METRIC,
@@ -70,10 +73,8 @@ fun MotorScreen(
         val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
         VargScreenTopAppBar(
             title = VargStrings.motorTitle(language),
-            subtitle = VargStrings.powerModesSubtitle(language, settings.powerMap),
+            subtitle = VargStrings.motorSubtitle(language, selectedMode, activeMaxPowerHp, hpUnit),
             onBack = onBack,
-            statusText = "${motor.powerHp} $hpUnit",
-            statusColor = VargSecondary,
         )
 
         if (isLandscape) {
@@ -91,8 +92,23 @@ fun MotorScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    MotorPowerMeterCard(motor = motor, settings = settings)
-                    MotorTempRow(motor = motor, settings = settings, tempColor = tempColor, unitSystem = unitSystem)
+                    MotorPowerMeterCard(
+                        motor = motor,
+                        settings = settings,
+                        selectedMode = selectedMode,
+                        activeMaxPowerHp = activeMaxPowerHp,
+                        hpUnit = hpUnit,
+                        language = language,
+                    )
+                    MotorTempRow(
+                        motor = motor,
+                        selectedMode = selectedMode,
+                        activeMaxPowerHp = activeMaxPowerHp,
+                        tempColor = tempColor,
+                        unitSystem = unitSystem,
+                        hpUnit = hpUnit,
+                        language = language,
+                    )
                 }
 
                 // Right Column: Configured Parameters
@@ -102,7 +118,14 @@ fun MotorScreen(
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    MotorConfigCard(settings = settings, timestamp = timestamp)
+                    MotorConfigCard(
+                        settings = settings,
+                        selectedMode = selectedMode,
+                        activeMaxPowerHp = activeMaxPowerHp,
+                        timestamp = timestamp,
+                        language = language,
+                        hpUnit = hpUnit,
+                    )
                 }
             }
         } else {
@@ -114,15 +137,37 @@ fun MotorScreen(
             ) {
                 Spacer(Modifier.height(8.dp))
 
-                MotorPowerMeterCard(motor = motor, settings = settings)
+                MotorPowerMeterCard(
+                    motor = motor,
+                    settings = settings,
+                    selectedMode = selectedMode,
+                    activeMaxPowerHp = activeMaxPowerHp,
+                    hpUnit = hpUnit,
+                    language = language,
+                )
 
                 Spacer(Modifier.height(14.dp))
 
-                MotorTempRow(motor = motor, settings = settings, tempColor = tempColor, unitSystem = unitSystem)
+                MotorTempRow(
+                    motor = motor,
+                    selectedMode = selectedMode,
+                    activeMaxPowerHp = activeMaxPowerHp,
+                    tempColor = tempColor,
+                    unitSystem = unitSystem,
+                    hpUnit = hpUnit,
+                    language = language,
+                )
 
                 Spacer(Modifier.height(14.dp))
 
-                MotorConfigCard(settings = settings, timestamp = timestamp)
+                MotorConfigCard(
+                    settings = settings,
+                    selectedMode = selectedMode,
+                    activeMaxPowerHp = activeMaxPowerHp,
+                    timestamp = timestamp,
+                    language = language,
+                    hpUnit = hpUnit,
+                )
             }
         }
     }
@@ -132,7 +177,15 @@ fun MotorScreen(
 private fun MotorPowerMeterCard(
     motor: MotorStatus,
     settings: RideSettings,
+    selectedMode: String,
+    activeMaxPowerHp: Int,
+    hpUnit: String,
+    language: AppLanguage,
 ) {
+    val maxVal = if (activeMaxPowerHp > 0) activeMaxPowerHp else settings.maxPowerHp
+    val quarter = (maxVal * 0.25).roundToInt()
+    val half = (maxVal * 0.5).roundToInt()
+    val threeQuarter = (maxVal * 0.75).roundToInt()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -141,14 +194,14 @@ private fun MotorPowerMeterCard(
             .padding(18.dp),
     ) {
         VargPrecisionMeter(
-            title = "⚡ Instantaneous Power Output",
-            unit = "hp",
+            title = if (language == AppLanguage.SPANISH) "⚡ Potencia Instantánea de Salida" else "⚡ Instantaneous Power Output",
+            unit = hpUnit.lowercase(),
             value = motor.powerHp.toFloat(),
-            maxValue = settings.maxPowerHp.toFloat(),
+            maxValue = maxVal.toFloat(),
             displayValue = "${motor.powerHp}",
             accentColor = VargSecondary,
-            tickSteps = listOf(0, 20, 40, 60, 80),
-            sideLabel = settings.powerMap.uppercase(),
+            tickSteps = listOf(0, quarter, half, threeQuarter, maxVal),
+            sideLabel = "$selectedMode • ${settings.powerMap.uppercase()}",
         )
     }
 }
@@ -156,9 +209,12 @@ private fun MotorPowerMeterCard(
 @Composable
 private fun MotorTempRow(
     motor: MotorStatus,
-    settings: RideSettings,
+    selectedMode: String,
+    activeMaxPowerHp: Int,
     tempColor: Color,
     unitSystem: UnitSystem = UnitSystem.METRIC,
+    hpUnit: String,
+    language: AppLanguage,
 ) {
     val (tempVal, tempUnit) = UnitConverter.formatTemperature(motor.temperatureC, unitSystem)
     Row(
@@ -188,7 +244,7 @@ private fun MotorTempRow(
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "CORE TEMPERATURE",
+                text = if (language == AppLanguage.SPANISH) "TEMPERATURA NÚCLEO" else "CORE TEMPERATURE",
                 style = StarkTypographyTokens.TechnicalHeader,
             )
         }
@@ -202,13 +258,13 @@ private fun MotorTempRow(
         ) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "${settings.maxPowerHp}",
+                    text = "$activeMaxPowerHp",
                     color = VargWhite,
                     style = StarkTypographyTokens.MetricMedium,
                 )
                 Spacer(Modifier.width(3.dp))
                 Text(
-                    text = "HP",
+                    text = hpUnit,
                     color = VargSecondary,
                     style = StarkTypographyTokens.MetricUnit,
                     modifier = Modifier.padding(bottom = 2.dp),
@@ -216,7 +272,7 @@ private fun MotorTempRow(
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "CALIBRATED MAX POWER",
+                text = if (language == AppLanguage.SPANISH) "POTENCIA MÁX ($selectedMode)" else "MAX POWER ($selectedMode)",
                 style = StarkTypographyTokens.TechnicalHeader,
             )
         }
@@ -226,7 +282,11 @@ private fun MotorTempRow(
 @Composable
 private fun MotorConfigCard(
     settings: RideSettings,
+    selectedMode: String,
+    activeMaxPowerHp: Int,
     timestamp: String,
+    language: AppLanguage,
+    hpUnit: String,
 ) {
     Column(
         modifier = Modifier
@@ -237,7 +297,7 @@ private fun MotorConfigCard(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "CONFIGURED MOTOR PARAMETERS",
+            text = if (language == AppLanguage.SPANISH) "PARÁMETROS DEL MOTOR CONFIGURADOS" else "CONFIGURED MOTOR PARAMETERS",
             style = StarkTypographyTokens.TechnicalHeader,
         )
 
@@ -245,7 +305,27 @@ private fun MotorConfigCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Power Map", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(
+                if (language == AppLanguage.SPANISH) "Modo de Potencia Activo" else "Active Power Mode",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text(
+                selectedMode,
+                color = VargSecondary,
+                style = StarkTypographyTokens.ValueMedium.copy(fontWeight = FontWeight.Bold),
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                if (language == AppLanguage.SPANISH) "Mapa de Potencia" else "Power Map",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
             Text(settings.powerMap.uppercase(), color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
@@ -253,15 +333,23 @@ private fun MotorConfigCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Configured Max Power", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text("${settings.maxPowerHp} HP", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
+            Text(
+                if (language == AppLanguage.SPANISH) "Potencia Máxima Calibrada" else "Calibrated Max Power",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text("$activeMaxPowerHp $hpUnit", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Engine Braking Setting", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(
+                if (language == AppLanguage.SPANISH) "Freno Motor (Engine Braking)" else "Engine Braking Setting",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
             Text("${settings.engineBrakingPct}%", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
@@ -269,7 +357,11 @@ private fun MotorConfigCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Regeneration Setting", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(
+                if (language == AppLanguage.SPANISH) "Regeneración" else "Regeneration Setting",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
             Text("${settings.regenPct}%", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
@@ -277,7 +369,11 @@ private fun MotorConfigCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(
+                if (language == AppLanguage.SPANISH) "Timestamp de Telemetría" else "Telemetry Timestamp",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
             Text(timestamp, color = VargTextSecondary, style = StarkTypographyTokens.ScaleTick)
         }
     }

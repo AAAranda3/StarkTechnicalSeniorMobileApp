@@ -120,7 +120,7 @@ fun PortraitDashboardCard(
             DashboardServiceCard(
                 iconContent = { VargIconMotor(color = VargSecondary, sizeDp = 18.dp) },
                 title = VargStrings.serviceMotor(language),
-                subtitle = "${motor.powerHp} $hpUnit • $motorTempVal $motorTempUnit",
+                subtitle = "$selectedMode • ${motor.powerHp} $hpUnit • $motorTempVal $motorTempUnit",
                 onClick = onOpenMotor,
             )
 

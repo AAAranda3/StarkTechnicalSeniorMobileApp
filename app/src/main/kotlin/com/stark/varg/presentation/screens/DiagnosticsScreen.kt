@@ -66,13 +66,10 @@ fun DiagnosticsScreen(
             .padding(horizontal = 16.dp),
     ) {
         // Standard Navigation TopAppBar
-        val activeText = if (language == AppLanguage.SPANISH) "ACTIVO" else "ACTIVE"
         VargScreenTopAppBar(
             title = VargStrings.diagnosticsTitle(language),
             subtitle = VargStrings.diagnosticsSubtitle(language),
             onBack = onBack,
-            statusText = if (hasAlerts) "${diagnostics.warnings.size} $activeText" else "NOMINAL",
-            statusColor = if (hasAlerts) alertColor else VargElectricGreen,
         )
 
         if (isLandscape) {

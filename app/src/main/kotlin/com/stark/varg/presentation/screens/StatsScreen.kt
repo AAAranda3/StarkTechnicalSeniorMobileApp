@@ -78,8 +78,6 @@ fun StatsScreen(
             title = VargStrings.statsTitle(language),
             subtitle = VargStrings.statsSubtitle(language),
             onBack = onBack,
-            statusText = if (language == AppLanguage.SPANISH) "REGISTRADO" else "RECORDED",
-            statusColor = Color(0xFFD4D4DC),
         )
 
         if (isLandscape) {

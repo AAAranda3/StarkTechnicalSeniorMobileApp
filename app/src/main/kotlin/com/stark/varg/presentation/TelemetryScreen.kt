@@ -189,6 +189,8 @@ fun TelemetryScreen(
                             MotorScreen(
                                 motor = snap.motor,
                                 settings = snap.rideSettings,
+                                selectedMode = selectedMode,
+                                activeMaxPowerHp = maxPowerHp,
                                 timestamp = snap.timestamp,
                                 unitSystem = unitSystem,
                                 language = language,

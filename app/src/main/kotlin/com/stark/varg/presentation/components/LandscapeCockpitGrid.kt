@@ -518,12 +518,11 @@ fun LandscapeCockpitGrid(
                     .fillMaxHeight()
                     .padding(start = 4.dp),
             ) {
-                // Section Header with < > (Pinned at top)
+                // Section Header (Pinned at top)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 2.dp, end = 2.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -531,11 +530,6 @@ fun LandscapeCockpitGrid(
                         style = StarkTypographyTokens.TechnicalHeader,
                         letterSpacing = 1.5.sp,
                     )
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("<", style = StarkTypographyTokens.TechnicalLabel.copy(color = VargSecondary.copy(alpha = 0.6f)))
-                        Text(">", style = StarkTypographyTokens.TechnicalLabel.copy(color = VargSecondary.copy(alpha = 0.6f)))
-                    }
                 }
 
                 // Scrollable Cards List
@@ -558,7 +552,7 @@ fun LandscapeCockpitGrid(
                     LandscapeServiceCard(
                         iconContent = { VargIconMotor(color = VargSecondary, sizeDp = 18.dp) },
                         title = VargStrings.serviceMotor(language),
-                        subtitle = "${motor.powerHp} $hpUnit • $motorTempVal $motorTempUnit",
+                        subtitle = "$selectedMode • ${motor.powerHp} $hpUnit • $motorTempVal $motorTempUnit",
                         onClick = onOpenMotor,
                     )
 

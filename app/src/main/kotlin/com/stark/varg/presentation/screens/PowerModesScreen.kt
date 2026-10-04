@@ -93,13 +93,10 @@ fun PowerModesScreen(
             .padding(horizontal = 16.dp),
     ) {
         // Standard Navigation TopAppBar
-        val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
         VargScreenTopAppBar(
             title = VargStrings.powerModesTitle(language),
             subtitle = VargStrings.powerModesSubtitle(language, selectedMode),
             onBack = onBack,
-            statusText = "$maxPowerHp $hpUnit",
-            statusColor = VargWhite,
         )
 
         if (isLandscape) {

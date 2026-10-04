@@ -91,8 +91,6 @@ fun BatteryScreen(
             title = VargStrings.batteryTitle(language),
             subtitle = if (isCharging) VargStrings.batteryStateCharging(language) else VargStrings.batteryStateDischarging(language, battery.chargingState.name),
             onBack = onBack,
-            statusText = "${battery.stateOfChargePct}%",
-            statusColor = if (isCharging) VargElectricGreen else VargWhite,
         )
 
         if (isLandscape) {

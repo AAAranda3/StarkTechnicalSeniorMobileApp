@@ -139,6 +139,11 @@ object VargStrings {
         AppLanguage.ENGLISH -> "MOTOR & POWERTRAIN"
     }
 
+    fun motorSubtitle(lang: AppLanguage, mode: String, hp: Int, hpUnit: String): String = when (lang) {
+        AppLanguage.SPANISH -> "Modo $mode • $hp $hpUnit calibrados"
+        AppLanguage.ENGLISH -> "Mode $mode • $hp $hpUnit calibrated"
+    }
+
     fun statsTitle(lang: AppLanguage): String = when (lang) {
         AppLanguage.SPANISH -> "ESTADÍSTICAS DE SESIÓN"
         AppLanguage.ENGLISH -> "SESSION STATISTICS"

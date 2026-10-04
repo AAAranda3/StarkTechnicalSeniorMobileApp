@@ -44,21 +44,18 @@ fun VargScreenTopAppBar(
     subtitle: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    statusText: String? = null,
-    statusColor: Color = VargWhite,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(VargPitchBlack)
             .padding(horizontal = 4.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Navigation Back Button + Title
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Box(
                 modifier = Modifier
@@ -87,22 +84,6 @@ fun VargScreenTopAppBar(
                     text = subtitle,
                     color = VargTextSecondary,
                     style = StarkTypographyTokens.CardSubtitle,
-                )
-            }
-        }
-
-        // Optional Status Badge on the Right (Rectangular, slightly rounded)
-        if (statusText != null) {
-            Box(
-                modifier = Modifier
-                    .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
-                    .border(1.dp, statusColor.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-                    .padding(horizontal = 9.dp, vertical = 4.dp),
-            ) {
-                Text(
-                    text = statusText,
-                    color = statusColor,
-                    style = StarkTypographyTokens.TechnicalHeader,
                 )
             }
         }
