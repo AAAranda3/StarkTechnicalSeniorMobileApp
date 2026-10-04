@@ -156,6 +156,9 @@ Comprehensive test suite covering positive, negative, and corner cases:
 # Assemble the debug APK
 ./gradlew assembleDebug
 
+# Assemble the obfuscated Release APK (with R8 ProGuard rules & resource shrinking)
+./gradlew assembleRelease
+
 # Run instrumented UI tests (requires emulator or device)
 ./gradlew connectedDebugAndroidTest
 
