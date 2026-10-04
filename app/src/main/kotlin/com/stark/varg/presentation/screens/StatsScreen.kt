@@ -23,9 +23,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.SessionData
+import com.stark.varg.domain.model.UnitSystem
+import com.stark.varg.domain.util.UnitConverter
 import com.stark.varg.presentation.components.CircuitTelemetryCard
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -39,13 +43,20 @@ fun StatsScreen(
     session: SessionData,
     timestamp: String,
     onBack: () -> Unit,
+    unitSystem: UnitSystem = UnitSystem.METRIC,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
 ) {
+    val (distVal, distUnit) = UnitConverter.formatDistance(session.distanceKm, unitSystem)
+    val (maxSpeedVal, maxSpeedUnit) = UnitConverter.formatSpeed(session.maxSpeedKmh, unitSystem)
+
     val avgSpeed = if (session.durationS > 0) {
         val hours = session.durationS / 3600.0
-        "%.1f km/h".format(session.distanceKm / hours)
+        val avgKmh = session.distanceKm / hours
+        val (avgVal, avgUnit) = UnitConverter.formatSpeed(avgKmh, unitSystem)
+        "$avgVal $avgUnit"
     } else {
-        "-- km/h"
+        "-- $maxSpeedUnit"
     }
 
     val configuration = LocalConfiguration.current
@@ -59,10 +70,10 @@ fun StatsScreen(
     ) {
         // Standard Navigation TopAppBar
         VargScreenTopAppBar(
-            title = "SESSION STATISTICS",
-            subtitle = "Recorded Trip Metrics",
+            title = VargStrings.statsTitle(language),
+            subtitle = VargStrings.statsSubtitle(language),
             onBack = onBack,
-            statusText = "RECORDED",
+            statusText = if (language == AppLanguage.SPANISH) "REGISTRADO" else "RECORDED",
             statusColor = Color(0xFFD4D4DC),
         )
 
@@ -87,12 +98,12 @@ fun StatsScreen(
                     ) {
                         MetricCard(
                             label = "TOTAL DISTANCE",
-                            value = "${session.distanceKm} km",
+                            value = "$distVal $distUnit",
                             modifier = Modifier.weight(1f),
                         )
                         MetricCard(
                             label = "MAX SPEED",
-                            value = "${session.maxSpeedKmh} km/h",
+                            value = "$maxSpeedVal $maxSpeedUnit",
                             modifier = Modifier.weight(1f),
                         )
                     }
@@ -142,12 +153,12 @@ fun StatsScreen(
                 ) {
                     MetricCard(
                         label = "TOTAL DISTANCE",
-                        value = "${session.distanceKm} km",
+                        value = "$distVal $distUnit",
                         modifier = Modifier.weight(1f),
                     )
                     MetricCard(
                         label = "MAX SPEED",
-                        value = "${session.maxSpeedKmh} km/h",
+                        value = "$maxSpeedVal $maxSpeedUnit",
                         modifier = Modifier.weight(1f),
                     )
                 }

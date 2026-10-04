@@ -34,16 +34,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
 import com.stark.varg.presentation.components.VargIconModes
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargPitchBlack
@@ -67,6 +78,7 @@ fun PowerModesScreen(
     onEngineBrakingChange: (Int) -> Unit,
     onRegenChange: (Int) -> Unit,
     onBack: () -> Unit,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
 ) {
     val modes = listOf("M1", "M2", "M3", "M4", "M5")
@@ -81,11 +93,12 @@ fun PowerModesScreen(
             .padding(horizontal = 16.dp),
     ) {
         // Standard Navigation TopAppBar
+        val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
         VargScreenTopAppBar(
-            title = "POWER MODES",
-            subtitle = "Active Map: ${settings.powerMap.uppercase()}",
+            title = VargStrings.powerModesTitle(language),
+            subtitle = VargStrings.powerModesSubtitle(language, selectedMode),
             onBack = onBack,
-            statusText = "$maxPowerHp HP",
+            statusText = "$maxPowerHp $hpUnit",
             statusColor = VargWhite,
         )
 
@@ -229,6 +242,7 @@ private fun ModesPillsRow(
     selectedMode: String,
     onModeSelect: (String) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -249,7 +263,15 @@ private fun ModesPillsRow(
                         color = if (isSelected) VargWhite else VargBorderSubtle,
                         shape = RoundedCornerShape(10.dp),
                     )
-                    .clickable { onModeSelect(mode) },
+                    .semantics {
+                        contentDescription = "Power mode $mode. ${if (isSelected) "Selected" else "Not selected"}"
+                        role = Role.RadioButton
+                        selected = isSelected
+                    }
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onModeSelect(mode)
+                    },
                 contentAlignment = Alignment.Center,
             ) {
                 Row(
@@ -332,6 +354,7 @@ private fun InteractiveSliderCard(
     val startInt = range.start.toInt()
     val endInt = range.endInclusive.toInt()
     val tickSteps = ((startInt / 10) * 10..endInt step 10).filter { it in startInt..endInt }
+    val haptic = LocalHapticFeedback.current
 
     Column(
         modifier = Modifier
@@ -388,19 +411,33 @@ private fun InteractiveSliderCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(30.dp)
-                .pointerInput(range) {
+                .semantics {
+                    contentDescription = "$title slider, currently ${currentValue.toInt()} $unit"
+                    progressBarRangeInfo = ProgressBarRangeInfo(
+                        current = currentValue,
+                        range = range,
+                        steps = (range.endInclusive - range.start).toInt(),
+                    )
+                }
+                .pointerInput(range, currentValue) {
                     detectTapGestures { offset ->
                         val fraction = (offset.x / size.width).coerceIn(0f, 1f)
-                        val newValue = range.start + fraction * (range.endInclusive - range.start)
-                        onValueChange(newValue.roundToInt().toFloat())
+                        val newValue = (range.start + fraction * (range.endInclusive - range.start)).roundToInt().toFloat()
+                        if (newValue != currentValue) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onValueChange(newValue)
+                        }
                     }
                 }
-                .pointerInput(range) {
+                .pointerInput(range, currentValue) {
                     detectHorizontalDragGestures { change, _ ->
                         change.consume()
                         val fraction = (change.position.x / size.width).coerceIn(0f, 1f)
-                        val newValue = range.start + fraction * (range.endInclusive - range.start)
-                        onValueChange(newValue.roundToInt().toFloat())
+                        val newValue = (range.start + fraction * (range.endInclusive - range.start)).roundToInt().toFloat()
+                        if (newValue != currentValue) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onValueChange(newValue)
+                        }
                     }
                 },
         ) {

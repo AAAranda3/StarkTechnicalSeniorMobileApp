@@ -26,10 +26,12 @@ import com.stark.varg.presentation.components.ErrorContent
 import com.stark.varg.presentation.components.LandscapeCockpitGrid
 import com.stark.varg.presentation.components.LoadingContent
 import com.stark.varg.presentation.components.PortraitDashboardCard
+import com.stark.varg.presentation.components.VargBottomNavigation
 import com.stark.varg.presentation.screens.BatteryScreen
 import com.stark.varg.presentation.screens.DiagnosticsScreen
 import com.stark.varg.presentation.screens.MotorScreen
 import com.stark.varg.presentation.screens.PowerModesScreen
+import com.stark.varg.presentation.screens.SettingsScreen
 import com.stark.varg.presentation.screens.StatsScreen
 import com.stark.varg.ui.theme.VargPitchBlack
 
@@ -43,6 +45,7 @@ sealed interface TelemetryDestination {
     data object Stats : TelemetryDestination
     data object Diagnostics : TelemetryDestination
     data object Battery : TelemetryDestination
+    data object Settings : TelemetryDestination
 }
 
 @Composable
@@ -59,6 +62,9 @@ fun TelemetryScreen(
     val engineBrakingPct by viewModel.engineBrakingPct.collectAsStateWithLifecycle()
     val regenPct by viewModel.regenPct.collectAsStateWithLifecycle()
     val chargeTargetPct by viewModel.chargeTargetPct.collectAsStateWithLifecycle()
+    val unitSystem by viewModel.unitSystem.collectAsStateWithLifecycle()
+    val isLiveStreamActive by viewModel.isLiveStreamActive.collectAsStateWithLifecycle()
+    val language by viewModel.language.collectAsStateWithLifecycle()
 
     // Intercept hardware / gesture back navigation when in sub-screens
     BackHandler(enabled = currentDestination != TelemetryDestination.Dashboard) {
@@ -67,6 +73,15 @@ fun TelemetryScreen(
 
     Scaffold(
         containerColor = VargPitchBlack,
+        bottomBar = {
+            if (!isLandscape && uiState is TelemetryUiState.Success) {
+                VargBottomNavigation(
+                    currentDestination = currentDestination,
+                    language = language,
+                    onTabSelected = { viewModel.navigateTo(it) },
+                )
+            }
+        },
     ) { paddingValues ->
         when (val state = uiState) {
             is TelemetryUiState.Loading -> LoadingContent(
@@ -89,54 +104,29 @@ fun TelemetryScreen(
                     when (currentDestination) {
                         TelemetryDestination.Dashboard -> {
                             if (isLandscape) {
-                                // Landscape Mode: Adaptive Dashboard
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(VargPitchBlack)
-                                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                ) {
-                                    // Left Column: Motorcycle Hero Showcase
-                                    Column(
-                                        modifier = Modifier
-                                            .weight(0.44f)
-                                            .fillMaxHeight()
-                                            .verticalScroll(rememberScrollState()),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        BikeShowcase(
-                                            bike = snap.bike,
-                                            battery = snap.battery,
-                                            diagnostics = snap.diagnostics,
-                                            onOpenBatteryOptions = { viewModel.navigateTo(TelemetryDestination.Battery) },
-                                            onOpenDiagnostics = { viewModel.navigateTo(TelemetryDestination.Diagnostics) },
-                                        )
-                                    }
-
-                                    // Right Column: Controls, Precision Meter & Service Cards
-                                    Column(
-                                        modifier = Modifier
-                                            .weight(0.56f)
-                                            .fillMaxHeight()
-                                            .verticalScroll(rememberScrollState()),
-                                    ) {
-                                        PortraitDashboardCard(
-                                            battery = snap.battery,
-                                            settings = snap.rideSettings,
-                                            motor = snap.motor,
-                                            session = snap.session,
-                                            diagnostics = snap.diagnostics,
-                                            selectedMode = selectedMode,
-                                            activeMaxPowerHp = maxPowerHp,
-                                            onOpenBatteryOptions = { viewModel.navigateTo(TelemetryDestination.Battery) },
-                                            onOpenStats = { viewModel.navigateTo(TelemetryDestination.Stats) },
-                                            onOpenModes = { viewModel.navigateTo(TelemetryDestination.Modes) },
-                                            onOpenMotor = { viewModel.navigateTo(TelemetryDestination.Motor) },
-                                            onOpenDiagnostics = { viewModel.navigateTo(TelemetryDestination.Diagnostics) },
-                                        )
-                                    }
-                                }
+                                // Landscape Mode: Dedicated Handlebar Cockpit Grid
+                                LandscapeCockpitGrid(
+                                    bike = snap.bike,
+                                    battery = snap.battery,
+                                    settings = snap.rideSettings,
+                                    motor = snap.motor,
+                                    session = snap.session,
+                                    diagnostics = snap.diagnostics,
+                                    selectedMode = selectedMode,
+                                    activeMaxPowerHp = maxPowerHp,
+                                    unitSystem = unitSystem,
+                                    language = language,
+                                    isLiveStreamActive = isLiveStreamActive,
+                                    onToggleUnitSystem = { viewModel.toggleUnitSystem() },
+                                    onToggleLiveStream = { viewModel.toggleLiveStream() },
+                                    onOpenModes = { viewModel.navigateTo(TelemetryDestination.Modes) },
+                                    onOpenMotor = { viewModel.navigateTo(TelemetryDestination.Motor) },
+                                    onOpenStats = { viewModel.navigateTo(TelemetryDestination.Stats) },
+                                    onOpenDiagnostics = { viewModel.navigateTo(TelemetryDestination.Diagnostics) },
+                                    onOpenBatteryOptions = { viewModel.navigateTo(TelemetryDestination.Battery) },
+                                    onOpenSettings = { viewModel.navigateTo(TelemetryDestination.Settings) },
+                                    onRefresh = { viewModel.loadTelemetry() },
+                                )
                             } else {
                                 Column(
                                     modifier = Modifier
@@ -149,8 +139,14 @@ fun TelemetryScreen(
                                         bike = snap.bike,
                                         battery = snap.battery,
                                         diagnostics = snap.diagnostics,
+                                        unitSystem = unitSystem,
+                                        language = language,
+                                        isLiveStreamActive = isLiveStreamActive,
+                                        onToggleUnitSystem = { viewModel.toggleUnitSystem() },
+                                        onToggleLiveStream = { viewModel.toggleLiveStream() },
                                         onOpenBatteryOptions = { viewModel.navigateTo(TelemetryDestination.Battery) },
                                         onOpenDiagnostics = { viewModel.navigateTo(TelemetryDestination.Diagnostics) },
+                                        onRefresh = { viewModel.loadTelemetry() },
                                     )
 
                                     // Stealth Black Section with Centered Battery/Autonomy & Dark Grey Tiles
@@ -162,6 +158,8 @@ fun TelemetryScreen(
                                         diagnostics = snap.diagnostics,
                                         selectedMode = selectedMode,
                                         activeMaxPowerHp = maxPowerHp,
+                                        unitSystem = unitSystem,
+                                        language = language,
                                         onOpenBatteryOptions = { viewModel.navigateTo(TelemetryDestination.Battery) },
                                         onOpenStats = { viewModel.navigateTo(TelemetryDestination.Stats) },
                                         onOpenModes = { viewModel.navigateTo(TelemetryDestination.Modes) },
@@ -184,6 +182,7 @@ fun TelemetryScreen(
                                 onEngineBrakingChange = { viewModel.updateEngineBraking(it) },
                                 onRegenChange = { viewModel.updateRegen(it) },
                                 onBack = { viewModel.navigateBack() },
+                                language = language,
                             )
                         }
                         TelemetryDestination.Motor -> {
@@ -191,6 +190,8 @@ fun TelemetryScreen(
                                 motor = snap.motor,
                                 settings = snap.rideSettings,
                                 timestamp = snap.timestamp,
+                                unitSystem = unitSystem,
+                                language = language,
                                 onBack = { viewModel.navigateBack() },
                             )
                         }
@@ -198,6 +199,8 @@ fun TelemetryScreen(
                             StatsScreen(
                                 session = snap.session,
                                 timestamp = snap.timestamp,
+                                unitSystem = unitSystem,
+                                language = language,
                                 onBack = { viewModel.navigateBack() },
                             )
                         }
@@ -205,6 +208,7 @@ fun TelemetryScreen(
                             DiagnosticsScreen(
                                 diagnostics = snap.diagnostics,
                                 timestamp = snap.timestamp,
+                                language = language,
                                 onBack = { viewModel.navigateBack() },
                             )
                         }
@@ -213,7 +217,22 @@ fun TelemetryScreen(
                                 battery = snap.battery,
                                 timestamp = snap.timestamp,
                                 selectedTarget = chargeTargetPct,
+                                unitSystem = unitSystem,
+                                language = language,
                                 onChargeTargetChange = { viewModel.updateChargeTarget(it) },
+                                onBack = { viewModel.navigateBack() },
+                                onToggleCharging = { viewModel.toggleCharging() },
+                            )
+                        }
+                        TelemetryDestination.Settings -> {
+                            SettingsScreen(
+                                language = language,
+                                unitSystem = unitSystem,
+                                isLiveStreamActive = isLiveStreamActive,
+                                onLanguageChange = { viewModel.selectLanguage(it) },
+                                onUnitSystemChange = { viewModel.setUnitSystem(it) },
+                                onToggleLiveStream = { viewModel.toggleLiveStream() },
+                                onRestoreFactoryModes = { viewModel.restoreFactoryModes() },
                                 onBack = { viewModel.navigateBack() },
                             )
                         }

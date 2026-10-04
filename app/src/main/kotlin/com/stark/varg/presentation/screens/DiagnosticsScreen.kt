@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,11 +27,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.DiagnosticsData
 import com.stark.varg.domain.model.Warning
 import com.stark.varg.domain.model.WarningSeverity
 import com.stark.varg.presentation.components.StarkPill
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -45,6 +49,7 @@ fun DiagnosticsScreen(
     diagnostics: DiagnosticsData,
     timestamp: String,
     onBack: () -> Unit,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
 ) {
     val hasCritical = diagnostics.warnings.any { it.severity == WarningSeverity.CRITICAL } || diagnostics.faultCodes.isNotEmpty()
@@ -61,11 +66,12 @@ fun DiagnosticsScreen(
             .padding(horizontal = 16.dp),
     ) {
         // Standard Navigation TopAppBar
+        val activeText = if (language == AppLanguage.SPANISH) "ACTIVO" else "ACTIVE"
         VargScreenTopAppBar(
-            title = "VEHICLE DIAGNOSTICS",
-            subtitle = "Advisory Log & Fault Diagnostics",
+            title = VargStrings.diagnosticsTitle(language),
+            subtitle = VargStrings.diagnosticsSubtitle(language),
             onBack = onBack,
-            statusText = if (hasAlerts) "${diagnostics.warnings.size} ACTIVE" else "NOMINAL",
+            statusText = if (hasAlerts) "${diagnostics.warnings.size} $activeText" else "NOMINAL",
             statusColor = if (hasAlerts) alertColor else VargElectricGreen,
         )
 
@@ -141,6 +147,36 @@ fun DiagnosticsScreen(
                     diagnostics.warnings.forEach { warning ->
                         FullWarningCard(warning)
                         Spacer(Modifier.height(10.dp))
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(ColorDarkTile, RoundedCornerShape(14.dp))
+                            .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
+                            .padding(18.dp),
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(VargElectricGreen, androidx.compose.foundation.shape.CircleShape),
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = "NO ACTIVE WARNINGS",
+                                    color = VargWhite,
+                                    style = StarkTypographyTokens.TechnicalHeader,
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = "All powertrain sensors and modules operating nominally.",
+                                    color = VargTextSecondary,
+                                    style = StarkTypographyTokens.CardSubtitle,
+                                )
+                            }
+                        }
                     }
                 }
 

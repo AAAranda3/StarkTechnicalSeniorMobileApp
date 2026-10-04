@@ -26,10 +26,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.MotorStatus
 import com.stark.varg.domain.model.RideSettings
+import com.stark.varg.domain.model.UnitSystem
+import com.stark.varg.domain.util.UnitConverter
 import com.stark.varg.presentation.components.VargPrecisionMeter
 import com.stark.varg.presentation.components.VargScreenTopAppBar
+import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
 import com.stark.varg.ui.theme.VargElectricGreen
@@ -46,6 +50,8 @@ fun MotorScreen(
     settings: RideSettings,
     timestamp: String,
     onBack: () -> Unit,
+    unitSystem: UnitSystem = UnitSystem.METRIC,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
 ) {
     val isTempElevated = motor.temperatureC >= 60.0
@@ -61,11 +67,12 @@ fun MotorScreen(
             .padding(horizontal = 16.dp),
     ) {
         // Standard Navigation TopAppBar
+        val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
         VargScreenTopAppBar(
-            title = "MOTOR & POWERTRAIN",
-            subtitle = "Active Map: ${settings.powerMap.uppercase()}",
+            title = VargStrings.motorTitle(language),
+            subtitle = VargStrings.powerModesSubtitle(language, settings.powerMap),
             onBack = onBack,
-            statusText = "${motor.powerHp} HP",
+            statusText = "${motor.powerHp} $hpUnit",
             statusColor = VargSecondary,
         )
 
@@ -85,7 +92,7 @@ fun MotorScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     MotorPowerMeterCard(motor = motor, settings = settings)
-                    MotorTempRow(motor = motor, settings = settings, tempColor = tempColor)
+                    MotorTempRow(motor = motor, settings = settings, tempColor = tempColor, unitSystem = unitSystem)
                 }
 
                 // Right Column: Configured Parameters
@@ -111,7 +118,7 @@ fun MotorScreen(
 
                 Spacer(Modifier.height(14.dp))
 
-                MotorTempRow(motor = motor, settings = settings, tempColor = tempColor)
+                MotorTempRow(motor = motor, settings = settings, tempColor = tempColor, unitSystem = unitSystem)
 
                 Spacer(Modifier.height(14.dp))
 
@@ -151,7 +158,9 @@ private fun MotorTempRow(
     motor: MotorStatus,
     settings: RideSettings,
     tempColor: Color,
+    unitSystem: UnitSystem = UnitSystem.METRIC,
 ) {
+    val (tempVal, tempUnit) = UnitConverter.formatTemperature(motor.temperatureC, unitSystem)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -165,13 +174,13 @@ private fun MotorTempRow(
         ) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "${motor.temperatureC}",
+                    text = tempVal,
                     color = tempColor,
                     style = StarkTypographyTokens.MetricMedium,
                 )
                 Spacer(Modifier.width(3.dp))
                 Text(
-                    text = "°C",
+                    text = tempUnit,
                     color = tempColor,
                     style = StarkTypographyTokens.MetricUnit,
                     modifier = Modifier.padding(bottom = 2.dp),
