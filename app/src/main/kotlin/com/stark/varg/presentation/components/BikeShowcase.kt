@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -401,5 +402,38 @@ fun BikeShowcase(
                 contentScale = ContentScale.Fit,
             )
         }
+
+        Spacer(Modifier.height(10.dp))
+
+        // Stark Marketing Tagline & User Welcome
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "RIDE ANYWHERE,\nANYTIME",
+                color = VargWhite,
+                textAlign = TextAlign.Center,
+                style = StarkTypographyTokens.BrandTitle.copy(
+                    fontSize = 17.sp,
+                    lineHeight = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.5.sp,
+                ),
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = VargStrings.riderWelcome(language),
+                color = VargTextSecondary,
+                textAlign = TextAlign.Center,
+                style = StarkTypographyTokens.CardSubtitle.copy(
+                    fontSize = 12.sp,
+                    letterSpacing = 0.5.sp,
+                ),
+            )
+        }
+        Spacer(Modifier.height(6.dp))
     }
 }
