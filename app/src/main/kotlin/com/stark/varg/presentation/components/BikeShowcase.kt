@@ -39,10 +39,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -305,22 +308,29 @@ fun BikeShowcase(
                     )
                     Spacer(Modifier.width(8.dp))
 
-                    // SoC Percentage Value (Stark Sans ExtraLight)
+                    // SoC Percentage Value (Stark Sans ExtraLight with % unit)
                     Text(
-                        text = "${battery.stateOfChargePct}",
+                        text = buildAnnotatedString {
+                            withStyle(
+                                SpanStyle(
+                                    fontSize = 38.sp,
+                                    fontWeight = FontWeight.ExtraLight,
+                                    letterSpacing = (-0.5).sp,
+                                ),
+                            ) {
+                                append("${battery.stateOfChargePct}")
+                            }
+                            withStyle(
+                                SpanStyle(
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    letterSpacing = 1.sp,
+                                ),
+                            ) {
+                                append("%")
+                            }
+                        },
                         color = VargWhite,
-                        fontSize = 38.sp,
-                        fontWeight = FontWeight.ExtraLight,
-                        letterSpacing = (-0.5).sp,
-                    )
-                    Spacer(Modifier.width(3.dp))
-                    Text(
-                        text = "%",
-                        color = VargWhite,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
-                        letterSpacing = 1.sp,
-                        modifier = Modifier.padding(bottom = 3.dp),
                     )
                 }
 

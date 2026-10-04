@@ -2,6 +2,7 @@ package com.stark.varg.presentation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import com.stark.varg.MainActivity
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -20,8 +21,13 @@ class TelemetryScreenTest {
 
     @Test
     fun happyPath_showsBikeInfo_battery_andActiveWarning() {
-        // Real LocalTelemetryDataSource reads from assets - no fake needed
-        composeTestRule.waitForIdle()
+        // Real LocalTelemetryDataSource reads from assets - wait for Splash screen to transition
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
+            composeTestRule
+                .onAllNodesWithText("73%")
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
 
         // Bike header visible
         composeTestRule.onNodeWithText("STARK VARG", substring = true, ignoreCase = true).assertIsDisplayed()
