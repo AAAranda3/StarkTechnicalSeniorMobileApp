@@ -123,7 +123,7 @@ app/src/main/kotlin/com/stark/varg/
 * 100% test coverage with exhaustive unit test validation.
 
 ### 4. 4 Hz Live CAN-Bus Stream Mode (`ObserveLiveTelemetryUseCase`)
-* Real-time 4 Hz simulated CAN-bus broadcast stream emitting dynamic throttle curves, motor RPM/power delivery variations, and thermal shifts.
+* Simulated CAN-bus broadcast stream emitting dynamic throttle curves, motor RPM/power delivery variations, and thermal shifts.
 * Pulsing high-tech indicator badge (`[ LIVE 4Hz ]` / `[ STREAM OFF ]`) with seamless Compose recomposition lifecycle handling.
 
 ### 5. Universal TalkBack Accessibility
