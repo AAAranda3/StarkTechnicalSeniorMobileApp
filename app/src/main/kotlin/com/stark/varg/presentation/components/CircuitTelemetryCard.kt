@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.domain.model.SessionData
 import com.stark.varg.ui.theme.StarkTypographyTokens
 import com.stark.varg.ui.theme.VargBorderSubtle
@@ -54,6 +55,7 @@ import com.stark.varg.ui.theme.VargWhite
 @Composable
 fun CircuitTelemetryCard(
     session: SessionData,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "CircuitRiderAnimation")
@@ -89,7 +91,7 @@ fun CircuitTelemetryCard(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "CIRCUIT GPS TRACE",
+                    text = if (language == AppLanguage.SPANISH) "TRAZADO GPS DE CIRCUITO" else "CIRCUIT GPS TRACE",
                     color = VargWhite,
                     style = StarkTypographyTokens.TechnicalHeader,
                 )
@@ -102,7 +104,7 @@ fun CircuitTelemetryCard(
                     .padding(horizontal = 8.dp, vertical = 3.dp),
             ) {
                 Text(
-                    text = "GPS TELEMETRY",
+                    text = if (language == AppLanguage.SPANISH) "TELEMETRÍA GPS" else "GPS TELEMETRY",
                     color = Color(0xFFD4D4DC),
                     style = StarkTypographyTokens.TechnicalLabel,
                 )
@@ -406,20 +408,32 @@ fun CircuitTelemetryCard(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                Text("CALCULATED PACE", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
-                Text(formatPace(session.distanceKm, session.durationS), color = VargWhite, style = StarkTypographyTokens.CardTitle)
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("GNSS SAMPLING", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
-                Text("10 Hz DGPS", color = VargWhite, style = StarkTypographyTokens.CardTitle)
+                Text(
+                    text = if (language == AppLanguage.SPANISH) "RITMO CALCULADO" else "CALCULATED PACE",
+                    color = VargTextSecondary,
+                    style = StarkTypographyTokens.TechnicalLabel,
+                )
+                Text(
+                    text = formatPace(session.distanceKm, session.durationS),
+                    color = VargWhite,
+                    style = StarkTypographyTokens.CardTitle,
+                )
             }
 
             Column(horizontalAlignment = Alignment.End) {
-                Text("TIMING GATES", color = VargTextSecondary, style = StarkTypographyTokens.TechnicalLabel)
-                Text("3 Sectors Active", color = Color(0xFFD4D4DC), style = StarkTypographyTokens.CardTitle)
+                Text(
+                    text = if (language == AppLanguage.SPANISH) "SECTORES DE CRONO" else "TIMING GATES",
+                    color = VargTextSecondary,
+                    style = StarkTypographyTokens.TechnicalLabel,
+                )
+                Text(
+                    text = if (language == AppLanguage.SPANISH) "3 Sectores Activos" else "3 Sectors Active",
+                    color = Color(0xFFD4D4DC),
+                    style = StarkTypographyTokens.CardTitle,
+                )
             }
         }
     }

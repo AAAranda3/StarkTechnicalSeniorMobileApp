@@ -59,6 +59,11 @@ fun StatsScreen(
         "-- $maxSpeedUnit"
     }
 
+    val distLabel = if (language == AppLanguage.SPANISH) "DISTANCIA TOTAL" else "TOTAL DISTANCE"
+    val maxSpeedLabel = if (language == AppLanguage.SPANISH) "VELOCIDAD MÁXIMA" else "MAX SPEED"
+    val sessionTimeLabel = if (language == AppLanguage.SPANISH) "TIEMPO DE SESIÓN" else "SESSION TIME"
+    val avgSpeedLabel = if (language == AppLanguage.SPANISH) "VELOCIDAD MEDIA" else "AVERAGE SPEED"
+
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -97,12 +102,12 @@ fun StatsScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         MetricCard(
-                            label = "TOTAL DISTANCE",
+                            label = distLabel,
                             value = "$distVal $distUnit",
                             modifier = Modifier.weight(1f),
                         )
                         MetricCard(
-                            label = "MAX SPEED",
+                            label = maxSpeedLabel,
                             value = "$maxSpeedVal $maxSpeedUnit",
                             modifier = Modifier.weight(1f),
                         )
@@ -113,18 +118,18 @@ fun StatsScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         MetricCard(
-                            label = "SESSION TIME",
+                            label = sessionTimeLabel,
                             value = formatFullDuration(session.durationS),
                             modifier = Modifier.weight(1f),
                         )
                         MetricCard(
-                            label = "AVERAGE SPEED",
+                            label = avgSpeedLabel,
                             value = avgSpeed,
                             modifier = Modifier.weight(1f),
                         )
                     }
 
-                    SessionLogCard(session = session, timestamp = timestamp)
+                    SessionLogCard(session = session, timestamp = timestamp, language = language)
                 }
 
                 // Right Column: Motocross / Race Track GPS Circuit Telemetry Visualizer
@@ -134,7 +139,7 @@ fun StatsScreen(
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    CircuitTelemetryCard(session = session)
+                    CircuitTelemetryCard(session = session, language = language)
                 }
             }
         } else {
@@ -152,12 +157,12 @@ fun StatsScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     MetricCard(
-                        label = "TOTAL DISTANCE",
+                        label = distLabel,
                         value = "$distVal $distUnit",
                         modifier = Modifier.weight(1f),
                     )
                     MetricCard(
-                        label = "MAX SPEED",
+                        label = maxSpeedLabel,
                         value = "$maxSpeedVal $maxSpeedUnit",
                         modifier = Modifier.weight(1f),
                     )
@@ -170,12 +175,12 @@ fun StatsScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     MetricCard(
-                        label = "SESSION TIME",
+                        label = sessionTimeLabel,
                         value = formatFullDuration(session.durationS),
                         modifier = Modifier.weight(1f),
                     )
                     MetricCard(
-                        label = "AVERAGE SPEED",
+                        label = avgSpeedLabel,
                         value = avgSpeed,
                         modifier = Modifier.weight(1f),
                     )
@@ -184,12 +189,12 @@ fun StatsScreen(
                 Spacer(Modifier.height(14.dp))
 
                 // Motocross / Race Track GPS Circuit Telemetry Visualizer
-                CircuitTelemetryCard(session = session)
+                CircuitTelemetryCard(session = session, language = language)
 
                 Spacer(Modifier.height(14.dp))
 
-                // Session Metadata & Telemetry Log (Non-redundant technical details)
-                SessionLogCard(session = session, timestamp = timestamp)
+                // Session Metadata & Telemetry Log
+                SessionLogCard(session = session, timestamp = timestamp, language = language)
             }
         }
     }
@@ -199,8 +204,12 @@ fun StatsScreen(
 private fun SessionLogCard(
     session: SessionData,
     timestamp: String,
+    language: AppLanguage = AppLanguage.SPANISH,
     modifier: Modifier = Modifier,
 ) {
+    val dateStr = formatSessionDate(timestamp, language)
+    val timeStr = formatSessionTime(timestamp)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -210,7 +219,7 @@ private fun SessionLogCard(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "SESSION METADATA & TELEMETRY LOG",
+            text = if (language == AppLanguage.SPANISH) "METADATOS Y REGISTRO DE SESIÓN" else "SESSION METADATA & TELEMETRY LOG",
             style = StarkTypographyTokens.TechnicalHeader,
         )
 
@@ -218,41 +227,82 @@ private fun SessionLogCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Recorded Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text(timestamp, color = VargWhite, style = StarkTypographyTokens.ScaleTick)
+            Text(
+                text = if (language == AppLanguage.SPANISH) "Fecha de registro" else "Recorded Date",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text(dateStr, color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Raw Elapsed Duration", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text("${session.durationS} seconds", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
+            Text(
+                text = if (language == AppLanguage.SPANISH) "Hora de registro" else "Recorded Time",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text(timeStr, color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Distance Logged", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text("${(session.distanceKm * 1000).toInt()} meters", color = VargWhite, style = StarkTypographyTokens.ValueMedium)
+            Text(
+                text = if (language == AppLanguage.SPANISH) "Duración exacta" else "Raw Elapsed Duration",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text(
+                text = if (language == AppLanguage.SPANISH) "${session.durationS} segundos" else "${session.durationS} seconds",
+                color = VargWhite,
+                style = StarkTypographyTokens.ValueMedium,
+            )
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Sync Status", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text("100% Synchronized", color = Color(0xFFD4D4DC), style = StarkTypographyTokens.ValueMedium)
+            Text(
+                text = if (language == AppLanguage.SPANISH) "Distancia registrada" else "Distance Logged",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text(
+                text = if (language == AppLanguage.SPANISH) "${(session.distanceKm * 1000).toInt()} metros" else "${(session.distanceKm * 1000).toInt()} meters",
+                color = VargWhite,
+                style = StarkTypographyTokens.ValueMedium,
+            )
         }
+    }
+}
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text("Telemetry Bus Channel", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text("CAN Bus Varg Logger", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-        }
+private fun formatSessionDate(isoTimestamp: String, language: AppLanguage): String {
+    return try {
+        val instant = java.time.Instant.parse(isoTimestamp)
+        val zone = java.time.ZoneId.systemDefault()
+        val zdt = instant.atZone(zone)
+        val locale = if (language == AppLanguage.SPANISH) java.util.Locale.forLanguageTag("es-ES") else java.util.Locale.US
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy", locale)
+        zdt.format(formatter).replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+    } catch (_: Exception) {
+        isoTimestamp
+    }
+}
+
+private fun formatSessionTime(isoTimestamp: String): String {
+    return try {
+        val instant = java.time.Instant.parse(isoTimestamp)
+        val zone = java.time.ZoneId.systemDefault()
+        val zdt = instant.atZone(zone)
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")
+        zdt.format(formatter)
+    } catch (_: Exception) {
+        "--:--"
     }
 }
 
