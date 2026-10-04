@@ -393,26 +393,15 @@ private fun CanBusSyncingBanner() {
                         .background(VargSecondary.copy(alpha = pulseAlpha), CircleShape),
                 )
                 Spacer(Modifier.width(9.dp))
-                Column {
-                    Text(
-                        text = "SYNCHRONIZING CAN BUS TELEMETRY...",
-                        color = VargWhite,
-                        style = StarkTypographyTokens.ScaleTick.copy(
-                            fontSize = 10.sp,
-                            letterSpacing = 1.2.sp,
-                            fontWeight = FontWeight.Medium,
-                        ),
-                    )
-                    Spacer(Modifier.height(2.dp))
-                    Text(
-                        text = "CAN-ID 0x7E0 • 500 KBPS • READING ECU",
-                        color = VargTextSecondary,
-                        style = StarkTypographyTokens.TechnicalLabel.copy(
-                            fontSize = 8.5.sp,
-                            letterSpacing = 0.8.sp,
-                        ),
-                    )
-                }
+                Text(
+                    text = "SYNCHRONIZING CAN BUS TELEMETRY...",
+                    color = VargWhite,
+                    style = StarkTypographyTokens.ScaleTick.copy(
+                        fontSize = 10.sp,
+                        letterSpacing = 1.2.sp,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                )
             }
 
             Text(
