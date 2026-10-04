@@ -95,7 +95,10 @@ fun PowerModesScreen(
         // Standard Navigation TopAppBar
         VargScreenTopAppBar(
             title = VargStrings.powerModesTitle(language),
-            subtitle = VargStrings.powerModesSubtitle(language, selectedMode),
+            subtitle = VargStrings.powerModesSubtitle(
+                language,
+                "${selectedMode.uppercase()} • ${com.stark.varg.presentation.util.VargModeUtil.getMapName(selectedMode, settings.powerMap)}"
+            ),
             onBack = onBack,
         )
 
@@ -307,13 +310,14 @@ private fun ModeProfileHeader(
             .border(1.dp, VargBorderSubtle, RoundedCornerShape(14.dp))
             .padding(16.dp),
     ) {
+        val modeMap = com.stark.varg.presentation.util.VargModeUtil.getMapName(selectedMode, settings.powerMap)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "$selectedMode PROFILE",
+                text = "$selectedMode $modeMap",
                 color = VargWhite,
                 style = StarkTypographyTokens.CardTitle,
             )
@@ -324,7 +328,7 @@ private fun ModeProfileHeader(
                     .padding(horizontal = 8.dp, vertical = 3.dp),
             ) {
                 Text(
-                    text = "MAP: ${settings.powerMap.uppercase()}",
+                    text = "MAP: $modeMap",
                     color = VargWhite,
                     style = StarkTypographyTokens.TechnicalLabel,
                 )

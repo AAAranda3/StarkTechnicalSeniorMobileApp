@@ -71,9 +71,10 @@ fun MotorScreen(
     ) {
         // Standard Navigation TopAppBar
         val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
+        val modeDisplayName = com.stark.varg.presentation.util.VargModeUtil.getDisplayName(selectedMode, settings.powerMap)
         VargScreenTopAppBar(
             title = VargStrings.motorTitle(language),
-            subtitle = VargStrings.motorSubtitle(language, selectedMode, activeMaxPowerHp, hpUnit),
+            subtitle = VargStrings.motorSubtitle(language, modeDisplayName, activeMaxPowerHp, hpUnit),
             onBack = onBack,
         )
 
@@ -201,7 +202,7 @@ private fun MotorPowerMeterCard(
             displayValue = "${motor.powerHp}",
             accentColor = VargSecondary,
             tickSteps = listOf(0, quarter, half, threeQuarter, maxVal),
-            sideLabel = "$selectedMode • ${settings.powerMap.uppercase()}",
+            sideLabel = "$selectedMode • ${com.stark.varg.presentation.util.VargModeUtil.getMapName(selectedMode, settings.powerMap)}",
         )
     }
 }
@@ -326,7 +327,7 @@ private fun MotorConfigCard(
                 color = VargTextSecondary,
                 style = StarkTypographyTokens.CardSubtitle,
             )
-            Text(settings.powerMap.uppercase(), color = VargWhite, style = StarkTypographyTokens.ValueMedium)
+            Text(com.stark.varg.presentation.util.VargModeUtil.getMapName(selectedMode, settings.powerMap), color = VargWhite, style = StarkTypographyTokens.ValueMedium)
         }
 
         Row(

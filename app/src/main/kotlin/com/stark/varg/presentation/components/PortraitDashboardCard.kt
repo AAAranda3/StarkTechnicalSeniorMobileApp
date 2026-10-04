@@ -108,10 +108,11 @@ fun PortraitDashboardCard(
         ) {
             // Power Modes Card (Bronze Accent)
             val hpUnit = if (language == AppLanguage.SPANISH) "CV" else "HP"
+            val modeDisplayName = com.stark.varg.presentation.util.VargModeUtil.getDisplayName(selectedMode, settings.powerMap)
             DashboardServiceCard(
                 iconContent = { VargIconModes(color = VargSecondary, sizeDp = 18.dp) },
                 title = VargStrings.servicePowerModes(language),
-                subtitle = "$selectedMode Profile • $activeMaxPowerHp $hpUnit",
+                subtitle = "$modeDisplayName • $activeMaxPowerHp $hpUnit",
                 onClick = onOpenModes,
             )
 

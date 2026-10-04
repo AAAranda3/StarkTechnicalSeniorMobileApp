@@ -58,14 +58,14 @@ class FullNavigationAndConfigurationTest {
         composeTestRule.waitForIdle()
 
         // Verify M1 profile header is updated uniquely
-        composeTestRule.onNodeWithText("M1 PROFILE").assertIsDisplayed()
+        composeTestRule.onNodeWithText("M1 TRAIL").assertIsDisplayed()
 
         // Navigate back to Dashboard using top app bar back button
         composeTestRule.onNodeWithContentDescription("Navigate back").performClick()
         composeTestRule.waitForIdle()
 
-        // In Dashboard, verify that the active power mode card reflects "M1"
-        composeTestRule.onNodeWithText("M1 Profile", substring = true).performScrollTo().assertIsDisplayed()
+        // In Dashboard, verify that the active power mode card reflects "M1 Trail"
+        composeTestRule.onNodeWithText("M1 Trail", substring = true).performScrollTo().assertIsDisplayed()
 
         // --- 3. MOTOR & POWERTRAIN SCREEN: Verify reflection of selected mode ---
         composeTestRule.onNodeWithText("Motor y Transmisión", ignoreCase = true).performScrollTo().performClick()

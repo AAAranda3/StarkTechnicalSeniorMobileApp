@@ -541,10 +541,11 @@ fun LandscapeCockpitGrid(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     // 1. Modos de Potencia
+                    val modeDisplayName = com.stark.varg.presentation.util.VargModeUtil.getDisplayName(selectedMode, settings.powerMap)
                     LandscapeServiceCard(
                         iconContent = { VargIconModes(color = VargSecondary, sizeDp = 18.dp) },
                         title = VargStrings.servicePowerModes(language),
-                        subtitle = "$selectedMode Profile • $activeMaxPowerHp $hpUnit",
+                        subtitle = "$modeDisplayName • $activeMaxPowerHp $hpUnit",
                         onClick = onOpenModes,
                     )
 
