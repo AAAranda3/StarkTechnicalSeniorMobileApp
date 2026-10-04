@@ -41,7 +41,7 @@ import com.stark.varg.domain.model.AppLanguage
 import com.stark.varg.presentation.TelemetryDestination
 import com.stark.varg.presentation.util.VargStrings
 import com.stark.varg.ui.theme.StarkTypographyTokens
-import com.stark.varg.ui.theme.VargStarkRed
+import com.stark.varg.ui.theme.VargSecondary
 import com.stark.varg.ui.theme.VargWhite
 
 enum class BottomNavTab(
@@ -124,13 +124,13 @@ private fun VargBottomNavItem(
     modifier: Modifier = Modifier,
 ) {
     val iconColor by animateColorAsState(
-        targetValue = if (isSelected) VargWhite else Color(0xFF6B7280),
+        targetValue = if (isSelected) VargSecondary else Color(0xFF6B7280),
         animationSpec = tween(durationMillis = 200),
         label = "BottomNavIconColor",
     )
 
     val textColor by animateColorAsState(
-        targetValue = if (isSelected) VargWhite else Color(0xFF6B7280),
+        targetValue = if (isSelected) VargSecondary else Color(0xFF6B7280),
         animationSpec = tween(durationMillis = 200),
         label = "BottomNavTextColor",
     )
@@ -151,13 +151,13 @@ private fun VargBottomNavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        // Micro indicator bar above active tab
+        // Micro indicator bar above active tab (Stark Gold / Bronze)
         Box(
             modifier = Modifier
                 .width(20.dp)
                 .height(2.dp)
                 .background(
-                    color = if (isSelected) VargStarkRed else Color.Transparent,
+                    color = if (isSelected) VargSecondary else Color.Transparent,
                     shape = RoundedCornerShape(1.dp),
                 ),
         )
