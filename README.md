@@ -157,6 +157,9 @@ Comprehensive test suite covering positive, negative, and corner cases:
 
 # Run instrumented UI tests (requires emulator or device)
 ./gradlew connectedDebugAndroidTest
+
+# Note: If device is connected via both USB and Wi-Fi ADB, run 'adb disconnect' first
+# to avoid INSTALL_FAILED_DUPLICATE_PACKAGE
 ```
 
 ---
