@@ -90,8 +90,8 @@ fun DiagnosticsScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    DiagnosticStatusBanner(hasAlerts = hasAlerts, alertColor = alertColor, diagnostics = diagnostics)
-                    FaultCodesCard(diagnostics = diagnostics, timestamp = timestamp)
+                    DiagnosticStatusBanner(hasAlerts = hasAlerts, alertColor = alertColor, diagnostics = diagnostics, language = language)
+                    FaultCodesCard(diagnostics = diagnostics, timestamp = timestamp, language = language)
                 }
 
                 // Right Column: Active Warnings
@@ -104,17 +104,17 @@ fun DiagnosticsScreen(
                 ) {
                     if (diagnostics.warnings.isNotEmpty()) {
                         Text(
-                            text = "ACTIVE WARNINGS (${diagnostics.warnings.size})",
+                            text = if (language == AppLanguage.SPANISH) "ADVERTENCIAS ACTIVAS (${diagnostics.warnings.size})" else "ACTIVE WARNINGS (${diagnostics.warnings.size})",
                             style = StarkTypographyTokens.TechnicalHeader,
                             color = VargWhite,
                         )
 
                         diagnostics.warnings.forEach { warning ->
-                            FullWarningCard(warning)
+                            FullWarningCard(warning = warning, language = language)
                         }
                     } else {
                         Text(
-                            text = "No active warnings",
+                            text = if (language == AppLanguage.SPANISH) "Sin advertencias activas" else "No active warnings",
                             color = VargTextSecondary,
                             style = StarkTypographyTokens.CardSubtitle,
                         )
@@ -130,14 +130,14 @@ fun DiagnosticsScreen(
             ) {
                 Spacer(Modifier.height(8.dp))
 
-                DiagnosticStatusBanner(hasAlerts = hasAlerts, alertColor = alertColor, diagnostics = diagnostics)
+                DiagnosticStatusBanner(hasAlerts = hasAlerts, alertColor = alertColor, diagnostics = diagnostics, language = language)
 
                 Spacer(Modifier.height(16.dp))
 
                 // Warnings Section strictly from JSON
                 if (diagnostics.warnings.isNotEmpty()) {
                     Text(
-                        text = "ACTIVE WARNINGS (${diagnostics.warnings.size})",
+                        text = if (language == AppLanguage.SPANISH) "ADVERTENCIAS ACTIVAS (${diagnostics.warnings.size})" else "ACTIVE WARNINGS (${diagnostics.warnings.size})",
                         style = StarkTypographyTokens.TechnicalHeader,
                         color = VargWhite,
                     )
@@ -145,7 +145,7 @@ fun DiagnosticsScreen(
                     Spacer(Modifier.height(8.dp))
 
                     diagnostics.warnings.forEach { warning ->
-                        FullWarningCard(warning)
+                        FullWarningCard(warning = warning, language = language)
                         Spacer(Modifier.height(10.dp))
                     }
                 } else {
@@ -165,13 +165,13 @@ fun DiagnosticsScreen(
                             Spacer(Modifier.width(10.dp))
                             Column {
                                 Text(
-                                    text = "NO ACTIVE WARNINGS",
+                                    text = if (language == AppLanguage.SPANISH) "SIN ADVERTENCIAS ACTIVAS" else "NO ACTIVE WARNINGS",
                                     color = VargWhite,
                                     style = StarkTypographyTokens.TechnicalHeader,
                                 )
                                 Spacer(Modifier.height(2.dp))
                                 Text(
-                                    text = "All powertrain sensors and modules operating nominally.",
+                                    text = if (language == AppLanguage.SPANISH) "Todos los sensores y módulos operando con normalidad." else "All powertrain sensors and modules operating nominally.",
                                     color = VargTextSecondary,
                                     style = StarkTypographyTokens.CardSubtitle,
                                 )
@@ -182,7 +182,7 @@ fun DiagnosticsScreen(
 
                 Spacer(Modifier.height(8.dp))
 
-                FaultCodesCard(diagnostics = diagnostics, timestamp = timestamp)
+                FaultCodesCard(diagnostics = diagnostics, timestamp = timestamp, language = language)
             }
         }
     }
@@ -193,6 +193,7 @@ private fun DiagnosticStatusBanner(
     hasAlerts: Boolean,
     alertColor: Color,
     diagnostics: DiagnosticsData,
+    language: AppLanguage = AppLanguage.SPANISH,
 ) {
     Column(
         modifier = Modifier
@@ -211,12 +212,20 @@ private fun DiagnosticStatusBanner(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (hasAlerts) "ADVISORIES REPORTED" else "ALL SENSORS NOMINAL",
+                text = if (hasAlerts) {
+                    if (language == AppLanguage.SPANISH) "AVISOS REGISTRADOS" else "ADVISORIES REPORTED"
+                } else {
+                    if (language == AppLanguage.SPANISH) "SENSORES NOMINALES" else "ALL SENSORS NOMINAL"
+                },
                 color = if (hasAlerts) alertColor else VargElectricGreen,
                 style = StarkTypographyTokens.TechnicalHeader,
             )
             Text(
-                text = "${diagnostics.warnings.size} Warnings • ${diagnostics.faultCodes.size} Faults",
+                text = if (language == AppLanguage.SPANISH) {
+                    "${diagnostics.warnings.size} Advertencias • ${diagnostics.faultCodes.size} Fallos"
+                } else {
+                    "${diagnostics.warnings.size} Warnings • ${diagnostics.faultCodes.size} Faults"
+                },
                 color = VargTextSecondary,
                 style = StarkTypographyTokens.CardSubtitle,
             )
@@ -228,6 +237,7 @@ private fun DiagnosticStatusBanner(
 private fun FaultCodesCard(
     diagnostics: DiagnosticsData,
     timestamp: String,
+    language: AppLanguage = AppLanguage.SPANISH,
 ) {
     Column(
         modifier = Modifier
@@ -238,14 +248,14 @@ private fun FaultCodesCard(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(
-            text = "FAULT CODES LOG",
+            text = if (language == AppLanguage.SPANISH) "REGISTRO DE CÓDIGOS DE FALLO" else "FAULT CODES LOG",
             color = VargWhite,
             style = StarkTypographyTokens.TechnicalHeader,
         )
 
         if (diagnostics.faultCodes.isEmpty()) {
             Text(
-                text = "0 DTC Fault Codes registered in vehicle memory.",
+                text = if (language == AppLanguage.SPANISH) "0 Códigos de fallo registrados en la memoria del vehículo." else "0 Fault codes registered in vehicle memory.",
                 color = VargTextSecondary,
                 style = StarkTypographyTokens.BodySmall,
             )
@@ -263,14 +273,25 @@ private fun FaultCodesCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Telemetry Timestamp", color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
-            Text(timestamp, color = VargTextSecondary, style = StarkTypographyTokens.CardSubtitle)
+            Text(
+                text = if (language == AppLanguage.SPANISH) "Fecha de telemetría" else "Telemetry Timestamp",
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
+            Text(
+                text = formatDiagnosticsDateTime(timestamp, language),
+                color = VargTextSecondary,
+                style = StarkTypographyTokens.CardSubtitle,
+            )
         }
     }
 }
 
 @Composable
-private fun FullWarningCard(warning: Warning) {
+private fun FullWarningCard(
+    warning: Warning,
+    language: AppLanguage = AppLanguage.SPANISH,
+) {
     val severityColor = when (warning.severity) {
         WarningSeverity.CRITICAL -> VargStarkRed
         WarningSeverity.WARNING -> VargWarningAmber
@@ -291,9 +312,10 @@ private fun FullWarningCard(warning: Warning) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "WARNING CODE: ${warning.code}",
-                color = VargTextSecondary,
-                style = StarkTypographyTokens.TechnicalLabel,
+                text = warning.message,
+                color = VargWhite,
+                style = StarkTypographyTokens.CardTitle,
+                modifier = Modifier.weight(1f).padding(end = 8.dp),
             )
             StarkPill(
                 text = warning.severity.name,
@@ -303,21 +325,26 @@ private fun FullWarningCard(warning: Warning) {
             )
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
 
         Text(
-            text = warning.message,
-            color = VargWhite,
-            style = StarkTypographyTokens.CardTitle,
-        )
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            text = "Telemetry report: ${warning.severity.name.lowercase()} level advisory.",
+            text = if (language == AppLanguage.SPANISH) "Aviso registrado de nivel ${warning.severity.name.lowercase()}." else "Telemetry report: ${warning.severity.name.lowercase()} level advisory.",
             color = VargTextSecondary,
             style = StarkTypographyTokens.CardSubtitle,
         )
+    }
+}
+
+private fun formatDiagnosticsDateTime(isoTimestamp: String, language: AppLanguage): String {
+    return try {
+        val instant = java.time.Instant.parse(isoTimestamp)
+        val zone = java.time.ZoneId.systemDefault()
+        val zdt = instant.atZone(zone)
+        val locale = if (language == AppLanguage.SPANISH) java.util.Locale.forLanguageTag("es-ES") else java.util.Locale.US
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm", locale)
+        zdt.format(formatter)
+    } catch (_: Exception) {
+        isoTimestamp
     }
 }
 
