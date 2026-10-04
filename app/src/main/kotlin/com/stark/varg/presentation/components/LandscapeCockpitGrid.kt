@@ -139,52 +139,66 @@ fun LandscapeCockpitGrid(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Left: Telemetry Sync + Live 4Hz Stream Toggle (Glove-Friendly Ergonomics)
+            // Left: Telemetry Sync + Live CAN Stream Toggle (Clean Integrated Header Icons)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                // Sync Icon Action (Integrated, transparent, 38dp touch target)
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF222228))
-                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .size(38.dp)
+                        .clip(CircleShape)
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onRefresh()
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    VargIconSync(color = VargSecondary, sizeDp = 24.dp)
+                    VargIconSync(color = VargWhite.copy(alpha = 0.85f), sizeDp = 20.dp)
                 }
 
+                // Live CAN Broadcast Stream Action (Sleek integrated indicator)
                 Box(
                     modifier = Modifier
-                        .height(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(if (isLiveStreamActive) Color(0x2200E676) else Color(0xFF222228))
-                        .border(1.dp, liveBorderColor, RoundedCornerShape(10.dp))
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (isLiveStreamActive) Color(0x2200E676) else Color.Transparent)
+                        .border(
+                            width = 1.dp,
+                            color = if (isLiveStreamActive) VargElectricGreen.copy(alpha = 0.5f) else Color.Transparent,
+                            shape = RoundedCornerShape(16.dp),
+                        )
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onToggleLiveStream()
                         }
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = if (isLiveStreamActive) 8.dp else 6.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .graphicsLayer { alpha = if (isLiveStreamActive) pulseAlpha else 0.4f }
-                                .background(if (isLiveStreamActive) VargElectricGreen else VargSecondary, CircleShape),
-                        )
-                        Spacer(Modifier.width(7.dp))
-                        Text(
-                            text = if (isLiveStreamActive) VargStrings.streamLiveBadge(language) else VargStrings.streamOffBadge(language),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        VargIconBroadcast(
                             color = if (isLiveStreamActive) VargElectricGreen else VargSecondary,
-                            style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                            sizeDp = 18.dp,
                         )
+                        if (isLiveStreamActive) {
+                            Spacer(Modifier.width(4.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .graphicsLayer { alpha = pulseAlpha }
+                                    .background(VargElectricGreen, CircleShape),
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = "LIVE",
+                                color = VargElectricGreen,
+                                style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
+                            )
+                        }
                     }
                 }
             }
@@ -224,61 +238,60 @@ fun LandscapeCockpitGrid(
                 }
             }
 
-            // Right: Unit System Pill + Bell (Alerts) + Settings Gear (Glove-Friendly Ergonomics)
+            // Right: Integrated Unit Pill + Bell + Settings Gear
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
+                // Sleek Compact Unit Switcher Pill
                 Box(
                     modifier = Modifier
-                        .height(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF222228))
-                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .height(28.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0x16FFFFFF))
+                        .border(1.dp, Color(0x24FFFFFF), RoundedCornerShape(14.dp))
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onToggleUnitSystem()
                         }
-                        .padding(horizontal = 14.dp),
+                        .padding(horizontal = 9.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = if (unitSystem == UnitSystem.METRIC) "KM / °C" else "MI / °F",
+                        text = if (unitSystem == UnitSystem.METRIC) "KM" else "MI",
                         color = VargWhite,
-                        style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp),
+                        style = StarkTypographyTokens.ScaleTick.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
                     )
                 }
 
+                // Diagnostics Bell (Clean Integrated Icon)
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF222228))
-                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .size(38.dp)
+                        .clip(CircleShape)
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onOpenDiagnostics()
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    VargIconBell(color = VargSecondary, sizeDp = 24.dp)
+                    VargIconBell(color = VargWhite.copy(alpha = 0.85f), sizeDp = 20.dp)
                     if (hasAlert) {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(top = 5.dp, end = 5.dp)
-                                .size(9.dp)
+                                .size(7.dp)
                                 .background(VargStarkRed, CircleShape),
                         )
                     }
                 }
 
+                // Settings Gear (Clean Integrated Icon)
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF222228))
-                        .border(1.dp, Color(0xFF363642), RoundedCornerShape(10.dp))
+                        .size(38.dp)
+                        .clip(CircleShape)
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onOpenSettings()
@@ -288,8 +301,8 @@ fun LandscapeCockpitGrid(
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
-                        tint = VargWhite,
-                        modifier = Modifier.size(24.dp),
+                        tint = VargWhite.copy(alpha = 0.85f),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }

@@ -134,24 +134,18 @@ fun PortraitDashboardCard(
             Spacer(Modifier.height(18.dp))
         }
 
-        // "SERVICES" Section Header
+        // Systems Section Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 2.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = VargStrings.servicesHeader(language),
+                text = VargStrings.systemsHeader(language),
                 style = StarkTypographyTokens.TechnicalHeader,
                 letterSpacing = 1.5.sp,
             )
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("<", style = StarkTypographyTokens.TechnicalLabel.copy(color = VargSecondary.copy(alpha = 0.6f)))
-                Text(">", style = StarkTypographyTokens.TechnicalLabel.copy(color = VargSecondary.copy(alpha = 0.6f)))
-            }
         }
 
         Spacer(Modifier.height(10.dp))

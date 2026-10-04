@@ -65,11 +65,13 @@ object VargStrings {
         AppLanguage.ENGLISH -> "All Systems Operational"
     }
 
-    // Dashboard Services & Cards
+    // Dashboard Systems & Cards
     fun servicesHeader(lang: AppLanguage): String = when (lang) {
-        AppLanguage.SPANISH -> "SERVICIOS"
-        AppLanguage.ENGLISH -> "SERVICES"
+        AppLanguage.SPANISH -> "SISTEMAS DEL VEHÍCULO"
+        AppLanguage.ENGLISH -> "VEHICLE SYSTEMS"
     }
+
+    fun systemsHeader(lang: AppLanguage): String = servicesHeader(lang)
 
     fun viewAction(lang: AppLanguage): String = when (lang) {
         AppLanguage.SPANISH -> "VER →"

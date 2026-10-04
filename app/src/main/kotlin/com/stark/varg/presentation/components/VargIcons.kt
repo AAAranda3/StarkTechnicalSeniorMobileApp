@@ -617,3 +617,45 @@ fun VargIconPlug(
     }
 }
 
+@Composable
+fun VargIconBroadcast(
+    modifier: Modifier = Modifier,
+    color: Color = VargSecondary,
+    sizeDp: Dp = 18.dp,
+) {
+    Canvas(modifier = modifier.size(sizeDp)) {
+        val w = size.width
+        val h = size.height
+        val stroke = 1.8.dp.toPx()
+
+        // Center transmitter dot
+        drawCircle(
+            color = color,
+            radius = 2.2.dp.toPx(),
+            center = Offset(w * 0.50f, h * 0.68f),
+        )
+
+        // Inner broadcast waves
+        drawArc(
+            color = color,
+            startAngle = 215f,
+            sweepAngle = 110f,
+            useCenter = false,
+            topLeft = Offset(w * 0.28f, h * 0.38f),
+            size = Size(w * 0.44f, h * 0.44f),
+            style = Stroke(stroke, cap = StrokeCap.Round),
+        )
+
+        // Outer broadcast waves
+        drawArc(
+            color = color,
+            startAngle = 215f,
+            sweepAngle = 110f,
+            useCenter = false,
+            topLeft = Offset(w * 0.12f, h * 0.16f),
+            size = Size(w * 0.76f, h * 0.76f),
+            style = Stroke(stroke, cap = StrokeCap.Round),
+        )
+    }
+}
+
